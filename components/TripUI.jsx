@@ -75,15 +75,33 @@ function Timeline({ trips, activeId, hoveredId, onHover, onLeave, onClick }) {
     return ticks;
   }, [minTs, maxTs]); // eslint-disable-line
 
+  // Enforce a minimum horizontal gap so close-dated pins never pile up
+  const MIN_SEP = 4.5; // %  ≈ 58px on a 1280px rail
+  const adjPcts = useMemoP(() => {
+    const raw = timestamps.map(ts => toPct(ts));
+    if (raw.length <= 1) return raw;
+    const r = [...raw];
+    // Forward pass: push right if too close
+    for (let i = 1; i < r.length; i++) {
+      if (r[i] - r[i - 1] < MIN_SEP) r[i] = r[i - 1] + MIN_SEP;
+    }
+    // If last pin overflowed past 99.5, compress backwards from the right
+    if (r[r.length - 1] > 99.5) {
+      r[r.length - 1] = 99.5;
+      for (let i = r.length - 2; i >= 0; i--) {
+        const max = r[i + 1] - MIN_SEP;
+        if (r[i] > max) r[i] = max;
+      }
+    }
+    return r;
+  }, [timestamps]); // eslint-disable-line
+
   // Greedy vertical staggering: pins within THRESH% of each other get offset up/down
   const THRESH = 4; // ~50px on a 1280px rail
   const pinRows = useMemoP(() => {
     const rows = [];
-    // track highest pct placed in each row: row 0 = center, 1 = above, -1 = below
     const rowMax = { 0: -Infinity, 1: -Infinity, '-1': -Infinity };
-    timestamps.forEach(ts => {
-      const p = toPct(ts);
-      // prefer center, then above, then below
+    adjPcts.forEach(p => {
       let chosen = 0;
       for (const r of [0, 1, -1]) {
         if (p - rowMax[r] >= THRESH) { chosen = r; break; }
@@ -92,7 +110,7 @@ function Timeline({ trips, activeId, hoveredId, onHover, onLeave, onClick }) {
       rows.push(chosen);
     });
     return rows;
-  }, [timestamps]); // eslint-disable-line
+  }, [adjPcts]); // eslint-disable-line
 
   // Vertical offsets per row (relative to the timeline-pins container = on the line)
   const ROW_TOP = { 0: -11, 1: -26, '-1': 4 };
@@ -110,7 +128,7 @@ function Timeline({ trips, activeId, hoveredId, onHover, onLeave, onClick }) {
 
         <div className="timeline-pins">
           {sorted.map((t, i) => {
-            const pct = toPct(timestamps[i]);
+            const pct = adjPcts[i];
             const row = pinRows[i];
             return (
               <button

@@ -53,15 +53,21 @@
       "n": "01",
       "title": "Grenoble - Clermont",
       "region": "France",
-      "date": "11 - 14 Aug",
+      "date": "11 Aug  - 14 Aug 2025",
       "year": 2025,
       "km": 848,
       "days": 4,
       "elev": 0,
       "difficulty": "Moderate",
       "riders": [
-        { "pilot_id": "pilot01", "bike_id": "bike03" },
-        { "pilot_id": "pilot02", "bike_id": "bike04" }
+        {
+          "pilot_id": "pilot01",
+          "bike_id": "bike03"
+        },
+        {
+          "pilot_id": "pilot02",
+          "bike_id": "bike04"
+        }
       ],
       "gear": [],
       "story": "On a allié pratique et plaisir, on, est aller chercher les clefs pour la coloc de Léa",
@@ -493,15 +499,21 @@
       "n": "02",
       "title": "Savoie, Haute -Savoie, Ain",
       "region": "France",
-      "date": "4 - 7 Aug",
+      "date": "4 Aug - 7 Aug 2025",
       "year": 2025,
       "km": 455,
       "days": 4,
       "elev": 0,
       "difficulty": "Moderate",
       "riders": [
-        { "pilot_id": "pilot01", "bike_id": "bike03" },
-        { "pilot_id": "pilot02", "bike_id": "bike04" }
+        {
+          "pilot_id": "pilot01",
+          "bike_id": "bike03"
+        },
+        {
+          "pilot_id": "pilot02",
+          "bike_id": "bike04"
+        }
       ],
       "gear": [],
       "story": "",
