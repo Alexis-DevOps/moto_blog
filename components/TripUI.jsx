@@ -1,16 +1,19 @@
-/* global React, maplibregl, buildStyle, MAPTILER_KEY */
+/* global React, maplibregl, buildStyle, MAPTILER_KEY, BIKES, PILOTS */
 const { useState, useRef, useEffect, useMemo: useMemoP } = React;
 
 const ACCENT = '#e86a33';
 
 // ---------- Hover preview card (HTML, positioned over map) ----------
 // x, y are already CSS pixel coords provided by the parent via map.project()
-function PreviewCard({ trip, x, y, W, H }) {
+function PreviewCard({ trip, x, y, W, H, preferRight = true, routeEdgeX = null, altRouteEdgeX = null }) {
   if (!trip) return null;
-  const cw = 280, ch = 172, gap = 44;
-  let left = x + gap;
+  const cw = 280, ch = 172, gap = 16;
+  const edge    = routeEdgeX    !== null ? routeEdgeX    : x;
+  const altEdge = altRouteEdgeX !== null ? altRouteEdgeX : x;
+  let left = preferRight ? edge + gap : edge - cw - gap;
   let top  = y - ch / 2;
-  if (left + cw > W - 12) left = x - cw - gap;
+  if (left + cw > W - 12) left = altEdge - cw - gap;
+  if (left < 12) left = altEdge + gap;
   if (top < 12) top = 12;
   if (top + ch > H - 12) top = H - ch - 12;
   return (
@@ -31,7 +34,7 @@ function PreviewCard({ trip, x, y, W, H }) {
         <div className="preview-stats">
           <div><b>{trip.km}</b><i>km</i></div>
           <div><b>{trip.days}</b><i>days</i></div>
-          <div><b>{(trip.elev/1000).toFixed(1)}k</b><i>m↑</i></div>
+          {trip.elev > 0 && <div><b>{(trip.elev/1000).toFixed(1)}k</b><i>m↑</i></div>}
         </div>
         <div className="preview-cta">Click pin to open roadbook →</div>
       </div>
@@ -184,6 +187,7 @@ function TripDetail({ trip, onClose, theme }) {
             <div className="detail-section-label">Route</div>
             <TripMiniMap trip={trip} theme={theme} />
 
+            {trip.elev > 0 && (<>
             <div className="detail-section-label">Elevation profile</div>
             <div className="elev-profile">
               <svg viewBox="0 0 300 70" preserveAspectRatio="none" width="100%" height="70">
@@ -216,6 +220,7 @@ function TripDetail({ trip, onClose, theme }) {
                 <span>{trip.km} km</span>
               </div>
             </div>
+            </>)}
 
             <div className="detail-section-label">Gallery</div>
             <div className="detail-gallery">
@@ -231,31 +236,58 @@ function TripDetail({ trip, onClose, theme }) {
             <div className="stat-grid">
               <div className="stat-cell"><b>{trip.km}</b><i>kilometres</i></div>
               <div className="stat-cell"><b>{trip.days}</b><i>days on road</i></div>
-              <div className="stat-cell"><b>{trip.elev.toLocaleString()}</b><i>m elev. gain</i></div>
+              {trip.elev > 0 && <div className="stat-cell"><b>{trip.elev.toLocaleString()}</b><i>m elev. gain</i></div>}
               <div className="stat-cell"><b>{trip.difficulty}</b><i>difficulty</i></div>
             </div>
 
             <div className="detail-section-label">Machine</div>
             <div className="bike-card">
-              <div className="bike-silhouette">
-                <svg viewBox="0 0 120 60" width="100%">
-                  <g stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round">
-                    <circle cx="25" cy="45" r="11" />
-                    <circle cx="95" cy="45" r="11" />
-                    <path d="M25 45 L45 28 L70 28 L85 22 L95 45" />
-                    <path d="M70 28 L75 18 L82 18" />
-                    <path d="M45 28 L50 18 L58 18" />
-                    <rect x="55" y="22" width="22" height="8" rx="2" />
-                  </g>
-                </svg>
-              </div>
-              <div className="bike-name">{trip.bike}</div>
+              {(() => {
+                const bike = (typeof BIKES !== 'undefined' ? BIKES : []).find(b => b.id === trip.bike_id);
+                const specs = bike ? [bike.year, bike.cc && `${bike.cc} cc`, bike.power_hp && `${bike.power_hp} hp`].filter(Boolean).join(' · ') : '';
+                return (
+                  <>
+                    {bike?.image
+                      ? <img src={bike.image} alt={`${bike.make} ${bike.model}`} className="bike-photo" />
+                      : <div className="bike-silhouette">
+                          <svg viewBox="0 0 120 60" width="100%">
+                            <g stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round">
+                              <circle cx="25" cy="45" r="11" />
+                              <circle cx="95" cy="45" r="11" />
+                              <path d="M25 45 L45 28 L70 28 L85 22 L95 45" />
+                              <path d="M70 28 L75 18 L82 18" />
+                              <path d="M45 28 L50 18 L58 18" />
+                              <rect x="55" y="22" width="22" height="8" rx="2" />
+                            </g>
+                          </svg>
+                        </div>
+                    }
+                    <div>
+                      <div className="bike-name">{bike ? `${bike.make} ${bike.model}` : '—'}</div>
+                      {specs && <div className="bike-specs">{specs}</div>}
+                    </div>
+                  </>
+                );
+              })()}
             </div>
 
             <div className="detail-section-label">Gear list</div>
             <ul className="gear-list">
               {trip.gear.map((g, i) => <li key={i}><span>·</span>{g}</li>)}
             </ul>
+
+            {(trip.pilot_ids || []).length > 0 && (() => {
+              const allPilots = typeof PILOTS !== 'undefined' ? PILOTS : [];
+              const found = trip.pilot_ids.map(id => allPilots.find(p => p.id === id)).filter(Boolean);
+              return found.length ? (
+                <>
+                  <div className="detail-section-label">{found.length > 1 ? 'Riders' : 'Rider'}</div>
+                  <ul className="gear-list">
+                    {found.map(p => <li key={p.id}><span>·</span>{p.name}{p.nationality ? `, ${p.nationality}` : ''}</li>)}
+                  </ul>
+                </>
+              ) : null;
+            })()}
 
             <button className="gpx-btn">
               <svg width="14" height="14" viewBox="0 0 14 14">

@@ -627,11 +627,19 @@ html, body {
   margin-bottom: 22px;
 }
 .bike-silhouette { color: var(--ink); margin-bottom: 6px; }
+.bike-photo { width: 100%; max-height: 160px; object-fit: cover; border-radius: 3px; margin-bottom: 10px; display: block; }
 .bike-name {
   font-family: 'JetBrains Mono', monospace;
   font-size: 11px;
   color: var(--ink);
   letter-spacing: 0.04em;
+}
+.bike-specs {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: var(--ink-dim);
+  margin-top: 3px;
+  opacity: 0.75;
 }
 
 .gear-list {

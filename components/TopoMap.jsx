@@ -146,7 +146,7 @@ function PinButton({ trip, pos, hovered, active, theme, onEnter, onLeave, onClic
 function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, onPinEnter, onPinLeave, onPinClick, onReady }) {
   const containerRef = useRef(null);
   const mapRef       = useRef(null);
-  const themeRef     = useRef(theme);
+  const mountedRef   = useRef(false);
   const animToken    = useRef({ cancelled: true });
   const [pinPositions, setPinPositions] = useState({});
   // layersReady triggers the route effect after style.load fires
@@ -183,39 +183,30 @@ function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, onPinEnter, 
     map.on('move', updatePins);
     map.on('resize', updatePins);
 
+    // Fires on initial load AND after every setStyle call
     map.on('style.load', () => {
       addRouteLayers(map);
       updatePins();
-      setLayersReady(true);   // ← causes route effect to re-run with current hover state
+      setLayersReady(true);
       if (onReady) onReady(map);
     });
 
-    mapRef.current  = map;
-    themeRef.current = theme;
+    mapRef.current = map;
 
     return () => { map.remove(); mapRef.current = null; };
   }, []); // eslint-disable-line
 
   // Theme change → rebuild style
   useEffect(() => {
+    // Skip the first run (mount); the map already uses the correct initial theme
+    if (!mountedRef.current) { mountedRef.current = true; return; }
     const map = mapRef.current;
-    if (!map || themeRef.current === theme) return;
-    themeRef.current = theme;
+    if (!map) return;
 
     animToken.current.cancelled = true;
     setLayersReady(false);
-
     map.setStyle(buildStyle(theme, MAPTILER_KEY));
-    map.once('style.load', () => {
-      addRouteLayers(map);
-      const pos = {};
-      trips.forEach(t => {
-        const pt = map.project([t.pin[1], t.pin[0]]);
-        pos[t.id] = { x: pt.x, y: pt.y };
-      });
-      setPinPositions({ ...pos });
-      setLayersReady(true);
-    });
+    // style.load fires → the permanent on('style.load') above re-adds layers and sets layersReady
   }, [theme]); // eslint-disable-line
 
   // Route visibility — runs whenever hover/open/toggle/layersReady changes

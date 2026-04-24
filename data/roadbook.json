@@ -1,228 +1,477 @@
 {
+  "bikes": [
+    {
+      "id": "bike03",
+      "make": "Honda",
+      "model": "CB 500 X",
+      "year": 2017,
+      "type": "Adventure",
+      "cc": 471,
+      "power_hp": 47,
+      "weight_kg": 196,
+      "color": "White",
+      "notes": "My First Bike, Alexis",
+      "image": "images/bikes/cb500x.jpeg"
+    }
+  ],
+  "pilots": [
+    {
+      "id": "pilot01",
+      "name": "Alexis",
+      "nationality": "French",
+      "since": 2024,
+      "license": "A2",
+      "bio": "",
+      "image": "images/pilots/alexis.png"
+    }
+  ],
   "trips": [
     {
       "id": "t01",
       "n": "01",
-      "title": "Route des Grandes Alpes",
+      "title": "Grenoble - Clermont",
       "region": "France",
-      "date": "12 Jun — 19 Jun 2024",
-      "year": 2024,
-      "km": 684,
-      "days": 7,
-      "elev": 14820,
+      "date": "11 - 14 Aug",
+      "year": 2025,
+      "km": 848,
+      "days": 4,
+      "elev": 0,
       "difficulty": "Moderate",
-      "bike": "BMW R 1250 GS Adventure",
-      "gear": ["Klim Badlands Pro", "Touratech panniers", "Michelin Anakee Adventure", "Garmin Zumo XT"],
-      "story": "From Thonon-les-Bains to Menton, seventeen alpine passes including the Iseran, Galibier and Bonette. Cold mornings above 2000m, warm lavender afternoons by the time we dropped into Provence.",
-      "gallery": ["Col de l'Iseran switchbacks", "Bivouac below Galibier", "Tunnel du Parpaillon", "Arrival at Menton waterfront"],
-      "waypoints": [[46.37,6.48],[45.50,6.90],[45.20,6.70],[45.04,6.40],[44.70,6.50],[44.32,6.83],[44.10,7.20],[43.78,7.50]],
-      "pin": [44.55, 6.82]
-    },
-    {
-      "id": "t02",
-      "n": "02",
-      "title": "Picos de Europa Loop",
-      "region": "Spain",
-      "date": "03 Sep — 10 Sep 2023",
-      "year": 2023,
-      "km": 913,
-      "days": 8,
-      "elev": 9400,
-      "difficulty": "Moderate",
-      "bike": "BMW R 1250 GS Adventure",
-      "gear": ["Rev'It Sand 4", "Wolfman dry bags", "Heidenau K60 Scout", "iPhone + Cardo"],
-      "story": "Bilbao, then south through Cantabria into the limestone cathedrals of the Picos. Rain for two days, then a week of perfect coastal sun along the Asturian shore.",
-      "gallery": ["Lagos de Covadonga", "Cabrales cheese cave", "Ruta del Cares trailhead", "San Vicente de la Barquera"],
-      "waypoints": [[43.26,-2.93],[43.33,-4.05],[43.25,-4.86],[43.17,-4.82],[43.40,-4.58],[43.38,-4.40],[43.47,-3.81]],
-      "pin": [43.20, -4.80]
-    },
-    {
-      "id": "t03",
-      "n": "03",
-      "title": "Dolomites Traverse",
-      "region": "Italy",
-      "date": "24 Jul — 29 Jul 2024",
-      "year": 2024,
-      "km": 520,
-      "days": 6,
-      "elev": 11200,
-      "difficulty": "Hard",
-      "bike": "BMW R 1250 GS Adventure",
-      "gear": ["Dainese Explorer", "Kriega US-30", "Continental TKC70", "Quad Lock"],
-      "story": "Six days chasing hairpins between Bolzano and Cortina. Passo Gardena at dawn with no cars, lunch at Rifugio Lagazuoi, and a thunderstorm over Tre Cime that will stay with me.",
-      "gallery": ["Passo Gardena sunrise", "Lagazuoi terrace", "Tre Cime under cloud", "Sella Ronda mid-morning"],
-      "waypoints": [[46.50,11.35],[46.55,11.70],[46.60,11.85],[46.54,12.10],[46.63,12.19],[46.42,12.13]],
-      "pin": [46.55, 11.85]
-    },
-    {
-      "id": "t04",
-      "n": "04",
-      "title": "North Coast 500",
-      "region": "Scotland",
-      "date": "05 May — 13 May 2023",
-      "year": 2023,
-      "km": 834,
-      "days": 9,
-      "elev": 7800,
-      "difficulty": "Moderate",
-      "bike": "BMW F 850 GS",
-      "gear": ["Klim Kodiak", "Givi Trekker Outback", "Metzeler Karoo 3", "Zumo XT"],
-      "story": "Inverness clockwise. Applecross pass in fog, Bealach na Bà rewarded us with ten minutes of sun, and the beach at Achmelvich had no one on it on a Tuesday in May.",
-      "gallery": ["Bealach na Bà summit", "Achmelvich bay", "Duncansby stacks", "Applecross Inn"],
-      "waypoints": [[57.48,-4.22],[57.73,-5.65],[58.20,-5.25],[58.55,-5.10],[58.64,-3.07],[57.60,-3.88],[57.48,-4.22]],
-      "pin": [58.30, -5.05]
-    },
-    {
-      "id": "t05",
-      "n": "05",
-      "title": "Transfăgărășan & Transalpina",
-      "region": "Romania",
-      "date": "18 Aug — 25 Aug 2022",
-      "year": 2022,
-      "km": 1420,
-      "days": 8,
-      "elev": 12600,
-      "difficulty": "Hard",
-      "bike": "BMW R 1250 GS Adventure",
-      "gear": ["Alpinestars Andes", "Mosko Moto Backcountry", "Mitas E-07", "Sena 50S"],
-      "story": "Two of the best roads in Europe, back to back. Shepherds on the Transalpina waved us past; marmots on the Transfăgărășan stared. Bran at night felt exactly as it sounds.",
-      "gallery": ["Bâlea Lake tunnel", "Transalpina ridge", "Bran village dusk", "Sibiu old town"],
-      "waypoints": [[45.80,24.15],[45.60,24.62],[45.41,24.61],[45.35,23.66],[45.13,23.50],[45.65,25.37]],
-      "pin": [45.55, 24.60]
-    },
-    {
-      "id": "t06",
-      "n": "06",
-      "title": "Norwegian Fjords",
-      "region": "Norway",
-      "date": "01 Jul — 14 Jul 2023",
-      "year": 2023,
-      "km": 2180,
-      "days": 14,
-      "elev": 18400,
-      "difficulty": "Hard",
-      "bike": "BMW R 1250 GS Adventure",
-      "gear": ["Rukka Nivala", "Lone Rider MotoTent", "Anakee Wild", "InReach Mini"],
-      "story": "Bergen up to Lofoten via Trollstigen and the Atlantic Road. Ferries every other day, midnight sun by the end, and a moose crossing in Nordland that I still think about.",
-      "gallery": ["Trollstigen switchbacks", "Atlantic Road bridge", "Reine at midnight", "Geirangerfjord viewpoint"],
-      "waypoints": [[60.39,5.32],[62.46,7.19],[63.01,7.32],[62.74,8.58],[66.28,14.23],[68.10,13.08]],
-      "pin": [63.00, 7.60]
-    },
-    {
-      "id": "t07",
-      "n": "07",
-      "title": "Pyrenees Crossing",
-      "region": "France / Spain",
-      "date": "20 Sep — 26 Sep 2022",
-      "year": 2022,
-      "km": 760,
-      "days": 7,
-      "elev": 13500,
-      "difficulty": "Moderate",
-      "bike": "BMW F 850 GS",
-      "gear": ["Klim Carlsbad", "Giant Loop Coyote", "Karoo 4", "Zumo XT"],
-      "story": "Atlantic to Mediterranean, ridge-line roads the whole way. Port de Pailhères at 6am was glass smooth and empty; Cerbère at sunset was a well-earned beer.",
-      "gallery": ["Col du Tourmalet cafe", "Port de Pailhères dawn", "Andorra border post", "Cerbère seafront"],
-      "waypoints": [[43.38,-1.65],[42.90,-0.14],[42.73,0.16],[42.74,1.46],[42.64,2.04],[42.45,3.17]],
-      "pin": [42.75, 0.80]
-    },
-    {
-      "id": "t08",
-      "n": "08",
-      "title": "Stelvio & Swiss Passes",
-      "region": "Switzerland / Italy",
-      "date": "07 Aug — 12 Aug 2024",
-      "year": 2024,
-      "km": 430,
-      "days": 6,
-      "elev": 15800,
-      "difficulty": "Hard",
-      "bike": "BMW R 1250 GS Adventure",
-      "gear": ["Dainese Antartica", "Kriega OS-base", "Anakee Adventure", "Cardo Packtalk"],
-      "story": "Stelvio before breakfast, Gavia for lunch, Bernina for the afternoon. Three days of pass-hunting based out of a guesthouse in Tirano with a garage big enough for the GS.",
-      "gallery": ["Stelvio 48 hairpins", "Gavia summit hut", "Bernina red train", "Umbrail pass"],
-      "waypoints": [[46.22,10.17],[46.53,10.45],[46.41,10.49],[46.41,10.02],[46.22,10.17]],
-      "pin": [46.50, 10.45]
-    },
-    {
-      "id": "t09",
-      "n": "09",
-      "title": "Corsica Island Loop",
-      "region": "Corsica",
-      "date": "16 May — 22 May 2024",
-      "year": 2024,
-      "km": 640,
-      "days": 7,
-      "elev": 10200,
-      "difficulty": "Moderate",
-      "bike": "BMW F 850 GS",
-      "gear": ["Rev'It Offtrack", "Enduristan Blizzard", "Scorpion Rally", "iPhone mount"],
-      "story": "Ferry from Nice, then a clockwise loop. Bavella needles, Calanches de Piana in golden hour, and more goats on the road than cars by far.",
-      "gallery": ["Col de Bavella spires", "Calanches de Piana", "Bonifacio cliffs", "Cap Corse lighthouse"],
-      "waypoints": [[41.92,8.74],[42.15,8.60],[42.70,9.45],[42.38,9.52],[41.60,9.28],[41.39,9.16],[41.92,8.74]],
-      "pin": [42.15, 9.10]
-    },
-    {
-      "id": "t10",
-      "n": "10",
-      "title": "Black Forest & Vosges",
-      "region": "Germany / France",
-      "date": "28 Apr — 03 May 2024",
-      "year": 2024,
-      "km": 510,
-      "days": 6,
-      "elev": 6400,
-      "difficulty": "Easy",
-      "bike": "BMW R 1250 GS Adventure",
-      "gear": ["Stadler Hurricane", "SW-Motech TraX", "Road 5 Trail", "Zumo XT"],
-      "story": "B500 through the Black Forest, over the Rhine, and up the Route des Crêtes. Cuckoo clocks on one side, tarte flambée on the other. Fast, flowing, early-season shake-down.",
-      "gallery": ["B500 forest sweeper", "Titisee morning", "Grand Ballon viewpoint", "Riquewihr square"],
-      "waypoints": [[48.46,8.45],[47.87,8.16],[47.55,7.59],[47.90,7.10],[48.17,7.28],[48.58,7.75]],
-      "pin": [48.00, 7.70]
-    },
-    {
-      "id": "t11",
-      "n": "11",
-      "title": "Peloponnese & Meteora",
-      "region": "Greece",
-      "date": "10 Oct — 20 Oct 2023",
-      "year": 2023,
-      "km": 1560,
-      "days": 11,
-      "elev": 11800,
-      "difficulty": "Moderate",
-      "bike": "BMW R 1250 GS Adventure",
-      "gear": ["Klim Badlands Pro", "Mosko Reckless 80", "Karoo 4", "Sena 50S"],
-      "story": "Athens south to Mani, back up through Arcadia, across to Meteora. Empty mountain roads, village tavernas, and monasteries on stone pillars that barely look possible.",
-      "gallery": ["Meteora at dawn", "Mani stone towers", "Arcadian switchbacks", "Nafplio harbor"],
-      "waypoints": [[37.98,23.73],[37.56,22.80],[36.70,22.31],[36.50,22.38],[37.51,22.37],[39.72,21.63]],
-      "pin": [37.50, 22.40]
-    },
-    {
-      "id": "t12",
-      "n": "12",
-      "title": "Iceland Ring Road",
-      "region": "Iceland",
-      "date": "22 Jun — 05 Jul 2022",
-      "year": 2022,
-      "km": 1910,
-      "days": 14,
-      "elev": 9200,
-      "difficulty": "Hard",
-      "bike": "BMW F 850 GS (rented)",
-      "gear": ["Klim Kodiak", "Mosko Backcountry 40", "Karoo 3", "InReach"],
-      "story": "Route 1 clockwise from Reykjavik. Crosswinds on the south coast, black sand at Vík, puffins at Dyrhólaey, and a midnight dip in a hot pool in the Westfjords.",
-      "gallery": ["Jökulsárlón icebergs", "Vík black beach", "Godafoss in mist", "Snæfellsnes lava field"],
-      "waypoints": [[64.14,-21.94],[63.42,-19.01],[64.01,-16.97],[65.27,-14.40],[65.68,-18.09],[64.77,-23.78],[64.14,-21.94]],
-      "pin": [64.80, -18.50]
+      "bike_id": "bike03",
+      "pilot_ids": [
+        "pilot01"
+      ],
+      "gear": [],
+      "story": "On a allié pratique et plaisir, on, est aller chercher les clefs pour la coloc de Léa",
+      "gallery": [],
+      "waypoints": [
+        [
+          45.19,
+          5.72
+        ],
+        [
+          45.24,
+          5.66
+        ],
+        [
+          45.23,
+          5.65
+        ],
+        [
+          45.21,
+          5.66
+        ],
+        [
+          45.22,
+          5.64
+        ],
+        [
+          45.07,
+          5.55
+        ],
+        [
+          45.08,
+          5.46
+        ],
+        [
+          45,
+          5.44
+        ],
+        [
+          44.98,
+          5.4
+        ],
+        [
+          44.94,
+          5.43
+        ],
+        [
+          44.84,
+          5.41
+        ],
+        [
+          44.82,
+          5.38
+        ],
+        [
+          44.83,
+          5.4
+        ],
+        [
+          44.81,
+          5.39
+        ],
+        [
+          44.76,
+          5.36
+        ],
+        [
+          44.76,
+          5.27
+        ],
+        [
+          44.71,
+          5.26
+        ],
+        [
+          44.69,
+          5.24
+        ],
+        [
+          44.72,
+          4.95
+        ],
+        [
+          44.76,
+          4.84
+        ],
+        [
+          44.76,
+          4.72
+        ],
+        [
+          44.73,
+          4.63
+        ],
+        [
+          44.73,
+          4.5
+        ],
+        [
+          44.63,
+          4.42
+        ],
+        [
+          44.62,
+          4.39
+        ],
+        [
+          44.65,
+          4.37
+        ],
+        [
+          44.64,
+          4.33
+        ],
+        [
+          44.68,
+          4.25
+        ],
+        [
+          44.66,
+          4.12
+        ],
+        [
+          44.69,
+          4.04
+        ],
+        [
+          44.71,
+          4.01
+        ],
+        [
+          44.75,
+          3.99
+        ],
+        [
+          44.76,
+          3.93
+        ],
+        [
+          44.78,
+          3.89
+        ],
+        [
+          44.85,
+          3.85
+        ],
+        [
+          44.82,
+          3.78
+        ],
+        [
+          44.84,
+          3.74
+        ],
+        [
+          44.82,
+          3.74
+        ],
+        [
+          44.76,
+          3.53
+        ],
+        [
+          44.74,
+          3.49
+        ],
+        [
+          44.74,
+          3.34
+        ],
+        [
+          44.77,
+          3.33
+        ],
+        [
+          44.8,
+          3.27
+        ],
+        [
+          44.88,
+          3.25
+        ],
+        [
+          44.89,
+          3.21
+        ],
+        [
+          44.91,
+          3.23
+        ],
+        [
+          45.03,
+          3.14
+        ],
+        [
+          45.03,
+          3.1
+        ],
+        [
+          45.06,
+          3.11
+        ],
+        [
+          45.05,
+          3.04
+        ],
+        [
+          45.06,
+          2.97
+        ],
+        [
+          45.08,
+          2.93
+        ],
+        [
+          45.11,
+          2.92
+        ],
+        [
+          45.1,
+          2.88
+        ],
+        [
+          45.16,
+          2.79
+        ],
+        [
+          45.13,
+          2.7
+        ],
+        [
+          45.33,
+          2.77
+        ],
+        [
+          45.36,
+          2.68
+        ],
+        [
+          45.4,
+          2.66
+        ],
+        [
+          45.43,
+          2.73
+        ],
+        [
+          45.45,
+          2.71
+        ],
+        [
+          45.51,
+          2.72
+        ],
+        [
+          45.53,
+          2.69
+        ],
+        [
+          45.54,
+          2.74
+        ],
+        [
+          45.58,
+          2.8
+        ],
+        [
+          45.57,
+          2.81
+        ],
+        [
+          45.63,
+          2.82
+        ],
+        [
+          45.65,
+          2.85
+        ],
+        [
+          45.66,
+          2.92
+        ],
+        [
+          45.69,
+          2.94
+        ],
+        [
+          45.71,
+          3.07
+        ],
+        [
+          45.74,
+          3.07
+        ],
+        [
+          45.75,
+          3.09
+        ],
+        [
+          45.72,
+          3.32
+        ],
+        [
+          45.75,
+          3.35
+        ],
+        [
+          45.79,
+          3.47
+        ],
+        [
+          45.84,
+          3.49
+        ],
+        [
+          45.86,
+          3.54
+        ],
+        [
+          45.88,
+          3.7
+        ],
+        [
+          45.81,
+          3.77
+        ],
+        [
+          45.83,
+          3.86
+        ],
+        [
+          45.76,
+          3.96
+        ],
+        [
+          45.71,
+          4.09
+        ],
+        [
+          45.68,
+          4.11
+        ],
+        [
+          45.67,
+          4.17
+        ],
+        [
+          45.64,
+          4.21
+        ],
+        [
+          45.65,
+          4.31
+        ],
+        [
+          45.63,
+          4.55
+        ],
+        [
+          45.6,
+          4.56
+        ],
+        [
+          45.58,
+          4.63
+        ],
+        [
+          45.6,
+          4.69
+        ],
+        [
+          45.59,
+          4.77
+        ],
+        [
+          45.52,
+          4.89
+        ],
+        [
+          45.49,
+          5.04
+        ],
+        [
+          45.5,
+          5.13
+        ],
+        [
+          45.41,
+          5.23
+        ],
+        [
+          45.44,
+          5.3
+        ],
+        [
+          45.37,
+          5.39
+        ],
+        [
+          45.31,
+          5.62
+        ],
+        [
+          45.27,
+          5.62
+        ],
+        [
+          45.2,
+          5.7
+        ],
+        [
+          45.11,
+          5.7
+        ],
+        [
+          45.08,
+          5.76
+        ]
+      ],
+      "pin": [
+        45.25,
+        4.22
+      ]
     }
   ],
   "stats": {
-    "total_km": 12360,
-    "total_days": 103,
-    "total_elev": 141120,
-    "trips": 12,
-    "countries": 11,
-    "years": [2022, 2023, 2024]
+    "total_km": 848,
+    "total_days": 4,
+    "total_elev": 0,
+    "trips": 1,
+    "countries": 1,
+    "years": [
+      2025
+    ]
   }
 }

@@ -1,0 +1,941 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Roadbook — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:       #0b131e;
+  --surface:  #101d2c;
+  --surface2: #152235;
+  --border:   #1e3040;
+  --text:     #c8d8e8;
+  --dim:      #4d6880;
+  --accent:   #e86a33;
+  --green:    #3ecf8e;
+  --red:      #e05252;
+  --in-bg:    #09111a;
+  --r:        3px;
+  font-family: 'Inter Tight', sans-serif;
+  font-size: 13px;
+  color: var(--text);
+  background: var(--bg);
+}
+body { height: 100vh; overflow: hidden; }
+
+/* ── Header ── */
+.hdr {
+  display: flex; align-items: center; gap: 16px;
+  height: 52px; padding: 0 18px;
+  background: var(--surface); border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.brand {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px; font-weight: 700; letter-spacing: 0.08em; color: var(--accent);
+  flex-shrink: 0;
+}
+.tabs { display: flex; gap: 2px; flex: 1; }
+.tab {
+  background: transparent; border: none; color: var(--dim);
+  padding: 6px 13px; font-family: 'Inter Tight', sans-serif;
+  font-size: 12px; font-weight: 600; letter-spacing: 0.03em;
+  border-radius: var(--r); cursor: pointer;
+  transition: color 0.12s, background 0.12s;
+}
+.tab:hover { color: var(--text); background: var(--surface2); opacity: 1; }
+.tab.on { color: var(--accent); background: var(--surface2); }
+.hdr-stats {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--dim); flex-shrink: 0;
+}
+
+/* ── Layout ── */
+.lay { display: flex; height: calc(100vh - 52px); }
+
+/* ── Sidebar ── */
+.side {
+  width: 230px; flex-shrink: 0;
+  border-right: 1px solid var(--border);
+  display: flex; flex-direction: column;
+  background: var(--surface);
+}
+.side-head {
+  padding: 10px 14px 8px;
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em;
+  color: var(--dim); text-transform: uppercase;
+  border-bottom: 1px solid var(--border);
+}
+.list { flex: 1; overflow-y: auto; }
+.item {
+  display: flex; align-items: center; gap: 8px;
+  padding: 9px 14px; cursor: pointer;
+  border-bottom: 1px solid var(--border);
+  transition: background 0.1s;
+}
+.item:hover { background: var(--surface2); }
+.item.on { background: var(--surface2); border-left: 2px solid var(--accent); padding-left: 12px; }
+.item-tag {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px; color: var(--accent); flex-shrink: 0; opacity: 0.8;
+}
+.item-name { font-size: 12px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.item-count { font-size: 10px; color: var(--dim); flex-shrink: 0; margin-left: auto; }
+.side-foot { padding: 10px 14px; border-top: 1px solid var(--border); }
+
+/* ── Main ── */
+.main { flex: 1; overflow-y: auto; }
+.wrap { max-width: 780px; padding: 26px 32px 80px; }
+
+.fhead {
+  display: flex; align-items: baseline; justify-content: space-between;
+  margin-bottom: 24px; padding-bottom: 14px; border-bottom: 1px solid var(--border);
+}
+.fhead h2 { font-size: 18px; font-weight: 700; }
+.fhead .fid {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 11px; color: var(--dim); margin-left: 8px; font-weight: 400;
+}
+
+/* ── Sections ── */
+section { margin-bottom: 28px; }
+section h3 {
+  font-size: 10px; font-weight: 700; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--dim); margin-bottom: 12px; padding-bottom: 6px; border-bottom: 1px solid var(--border);
+}
+.hint { font-weight: 400; letter-spacing: 0; text-transform: none; font-size: 10px; opacity: 0.65; }
+
+/* ── Fields ── */
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.wide { grid-column: 1 / -1; }
+label {
+  display: flex; flex-direction: column; gap: 4px;
+  font-size: 11px; font-weight: 600; color: var(--dim); letter-spacing: 0.04em;
+}
+input[type="text"], input[type="number"], select, textarea {
+  width: 100%; background: var(--in-bg);
+  border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--text); font-family: 'Inter Tight', sans-serif;
+  font-size: 13px; padding: 7px 9px; outline: none; transition: border-color 0.15s;
+}
+input:focus, select:focus, textarea:focus { border-color: var(--accent); }
+textarea { resize: vertical; min-height: 80px; }
+select { cursor: pointer; }
+
+/* ── Checkbox rows (pilot multi-select) ── */
+.check-list { display: flex; flex-direction: column; gap: 8px; }
+.check-row {
+  display: flex !important; flex-direction: row !important;
+  align-items: center; gap: 8px; cursor: pointer;
+  font-size: 13px; color: var(--text); font-weight: 400; letter-spacing: 0;
+}
+.check-row input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: pointer; }
+
+/* ── List editor ── */
+.le { display: flex; flex-direction: column; gap: 6px; }
+.le-row { display: flex; gap: 6px; align-items: center; }
+.le-row input { flex: 1; }
+.pin-row { display: flex; gap: 10px; margin-bottom: 12px; }
+.pin-row label { flex: 1; }
+
+/* ── Buttons ── */
+button { font-family: 'Inter Tight', sans-serif; font-size: 12px; font-weight: 600; cursor: pointer; border: none; border-radius: var(--r); transition: opacity 0.15s, background 0.15s, color 0.15s, border-color 0.15s; }
+button:hover { opacity: 0.85; }
+.bp  { background: var(--accent); color: #fff; padding: 8px 16px; }
+.bg  { background: transparent; border: 1px solid var(--border); color: var(--dim); padding: 8px 14px; }
+.bg:hover  { border-color: var(--accent); color: var(--accent); opacity: 1; }
+.bd  { background: transparent; border: 1px solid var(--border); color: var(--red); padding: 6px 12px; font-size: 11px; }
+.bd:hover  { border-color: var(--red); opacity: 1; }
+.bi  { background: var(--surface); border: 1px solid var(--border); color: var(--dim); width: 28px; height: 28px; display: flex; align-items: center; justify-content: center; font-size: 15px; flex-shrink: 0; padding: 0; }
+.bi:hover  { color: var(--red); border-color: var(--red); opacity: 1; }
+.ba  { background: transparent; border: 1px dashed var(--border); color: var(--dim); padding: 6px 10px; font-size: 11px; text-align: left; align-self: flex-start; }
+.ba:hover  { border-color: var(--accent); color: var(--accent); opacity: 1; }
+.bn  { background: transparent; border: 1px dashed var(--border); color: var(--dim); padding: 9px 14px; font-size: 12px; text-align: left; width: 100%; }
+.bn:hover  { border-color: var(--accent); color: var(--accent); opacity: 1; }
+.bcp { background: var(--green); color: #fff; padding: 8px 16px; }
+
+.ferr { font-size: 11px; color: var(--red); margin-top: 4px; font-family: 'JetBrains Mono', monospace; }
+
+/* ── GPX importer ── */
+.gpx-drop {
+  display: flex; align-items: center; justify-content: center;
+  border: 1px dashed var(--border); border-radius: var(--r);
+  padding: 18px; cursor: pointer; color: var(--dim);
+  font-size: 12px; font-weight: 600; letter-spacing: 0.04em;
+  transition: border-color 0.15s, color 0.15s; background: var(--in-bg);
+}
+.gpx-drop:hover, .gpx-drop.over { border-color: var(--accent); color: var(--accent); }
+.gpx-drop.over { background: rgba(232,106,51,0.06); }
+.gpx-preview {
+  margin-top: 10px; padding: 12px 14px;
+  background: var(--surface2); border: 1px solid var(--border); border-radius: var(--r);
+}
+.gpx-file-list { display: flex; flex-direction: column; gap: 4px; margin-bottom: 10px; }
+.gpx-file-row {
+  display: flex; align-items: center; gap: 8px; padding: 6px 8px;
+  background: var(--in-bg); border: 1px solid var(--border); border-radius: var(--r);
+}
+.gpx-file-n    { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--accent); flex-shrink: 0; width: 14px; text-align: right; }
+.gpx-file-name { font-size: 11px; font-weight: 600; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gpx-file-meta { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--dim); flex-shrink: 0; }
+.gpx-file-btns { display: flex; gap: 3px; flex-shrink: 0; }
+.gpx-divider   { height: 1px; background: var(--border); margin: 10px 0; }
+.gpx-stats {
+  display: flex; flex-wrap: wrap; gap: 16px; margin-bottom: 12px;
+  font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--dim);
+}
+.gpx-stats b { color: var(--text); font-size: 13px; }
+.gpx-no-time { font-size: 11px; color: var(--dim); font-style: italic; }
+.gpx-acts { display: flex; gap: 8px; }
+.bi:disabled { opacity: 0.2; cursor: default; pointer-events: none; }
+
+/* ── Modal ── */
+.ov { position: fixed; inset: 0; background: rgba(0,0,0,0.72); display: flex; align-items: center; justify-content: center; z-index: 100; }
+.mo { background: var(--surface); border: 1px solid var(--border); border-radius: 6px; width: min(740px,90vw); height: 80vh; display: flex; flex-direction: column; overflow: hidden; }
+.mo-h { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; border-bottom: 1px solid var(--border); flex-shrink: 0; }
+.mo-h h3 { font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; }
+.mo-acts { display: flex; gap: 8px; align-items: center; }
+.mo-ta { flex: 1; min-height: 0; resize: none; border: none; border-radius: 0; font-family: 'JetBrains Mono', monospace; font-size: 11px; line-height: 1.65; background: var(--in-bg); color: var(--text); padding: 16px 18px; }
+.mo-ft { padding: 10px 18px; font-size: 11px; color: var(--dim); border-top: 1px solid var(--border); flex-shrink: 0; }
+.mo-ft code { font-family: 'JetBrains Mono', monospace; color: var(--accent); }
+
+/* ── States ── */
+.loading, .empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 10px; color: var(--dim); font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+.err-txt { color: var(--red); }
+.err-txt small { display: block; margin-top: 6px; font-size: 10px; opacity: 0.7; }
+
+::-webkit-scrollbar { width: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--dim); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+const DIFFICULTIES  = ['Easy', 'Moderate', 'Hard'];
+const BIKE_TYPES    = ['Adventure', 'Naked', 'Sport', 'Touring', 'Enduro', 'Scrambler', 'Cruiser', 'Other'];
+const LICENSES      = ['A', 'A2', 'A1', 'B', 'Other'];
+
+// ── helpers ────────────────────────────────────────────────────────────────────
+
+function computeStats(trips) {
+  const regions = trips.flatMap(t => (t.region || '').split('/').map(r => r.trim()));
+  return {
+    total_km:   trips.reduce((s, t) => s + (t.km   || 0), 0),
+    total_days: trips.reduce((s, t) => s + (t.days || 0), 0),
+    total_elev: trips.reduce((s, t) => s + (t.elev || 0), 0),
+    trips:      trips.length,
+    countries:  new Set(regions).size,
+    years:      [...new Set(trips.map(t => t.year).filter(Boolean))].sort(),
+  };
+}
+
+function renumber(trips) {
+  return trips.map((t, i) => { const n = String(i+1).padStart(2,'0'); return { ...t, id:`t${n}`, n }; });
+}
+
+function nextId(items, prefix) {
+  const nums = items.map(x => parseInt(x.id.replace(prefix,'')) || 0);
+  const n = String((nums.length ? Math.max(...nums) : 0) + 1).padStart(2,'0');
+  return `${prefix}${n}`;
+}
+
+function blankTrip(trips) {
+  const n = String(trips.length+1).padStart(2,'0');
+  return { id:`t${n}`, n, title:'', region:'', date:'', year:new Date().getFullYear(), km:0, days:0, elev:0, difficulty:'Moderate', bike_id:'', pilot_ids:[], gear:[], story:'', gallery:[], waypoints:[], pin:[0,0] };
+}
+function blankBike(bikes) {
+  return { id:nextId(bikes,'bike'), make:'', model:'', year:new Date().getFullYear(), type:'Adventure', cc:0, power_hp:0, weight_kg:0, color:'', notes:'', image:'' };
+}
+function blankPilot(pilots) {
+  return { id:nextId(pilots,'pilot'), name:'', nationality:'', since:new Date().getFullYear(), license:'A', bio:'', image:'' };
+}
+
+// ── ListEditor ─────────────────────────────────────────────────────────────────
+
+function ListEditor({ items, onChange, placeholder }) {
+  const upd = (i, v) => { const a=[...items]; a[i]=v; onChange(a); };
+  const del = (i) => onChange(items.filter((_,j)=>j!==i));
+  return (
+    <div className="le">
+      {items.map((item,i) => (
+        <div className="le-row" key={i}>
+          <input type="text" value={item} placeholder={placeholder} onChange={e=>upd(i,e.target.value)} />
+          <button className="bi" onClick={()=>del(i)} title="Remove">×</button>
+        </div>
+      ))}
+      <button className="ba" onClick={()=>onChange([...items,''])}>+ Add</button>
+    </div>
+  );
+}
+
+// ── WaypointsEditor ────────────────────────────────────────────────────────────
+
+function WaypointsEditor({ value, onChange }) {
+  const [text, setText] = useState(()=>JSON.stringify(value));
+  const [err,  setErr]  = useState(null);
+  const onBlur = () => {
+    try {
+      const p = JSON.parse(text);
+      if (!Array.isArray(p)) { setErr('Expected a JSON array'); return; }
+      onChange(p); setErr(null);
+    } catch(_) { setErr('Invalid JSON'); }
+  };
+  return (
+    <>
+      <textarea value={text} onChange={e=>setText(e.target.value)} onBlur={onBlur} rows={3}
+        style={{ fontFamily:"'JetBrains Mono',monospace", fontSize:11 }} />
+      {err && <div className="ferr">✗ {err}</div>}
+    </>
+  );
+}
+
+// ── GPX utilities (pure JS + DOMParser, no external lib) ──────────────────────
+
+function haversineKm(a, b) {
+  const R = 6371, rad = Math.PI / 180;
+  const dLat = (b.lat - a.lat) * rad, dLon = (b.lon - a.lon) * rad;
+  const x = Math.sin(dLat/2)**2 + Math.cos(a.lat*rad) * Math.cos(b.lat*rad) * Math.sin(dLon/2)**2;
+  return R * 2 * Math.atan2(Math.sqrt(x), Math.sqrt(1-x));
+}
+
+function dpSimplify(pts, eps) {
+  if (pts.length <= 2) return pts;
+  let maxD = 0, split = 0;
+  const [ax,ay] = pts[0], [bx,by] = pts[pts.length-1];
+  const dx = bx-ax, dy = by-ay, len2 = dx*dx + dy*dy;
+  for (let i = 1; i < pts.length-1; i++) {
+    const [px,py] = pts[i];
+    let d;
+    if (len2 === 0) d = Math.hypot(px-ax, py-ay);
+    else { const t = Math.max(0, Math.min(1, ((px-ax)*dx+(py-ay)*dy)/len2)); d = Math.hypot(px-(ax+t*dx), py-(ay+t*dy)); }
+    if (d > maxD) { maxD = d; split = i; }
+  }
+  if (maxD > eps) { const l=dpSimplify(pts.slice(0,split+1),eps), r=dpSimplify(pts.slice(split),eps); return [...l.slice(0,-1),...r]; }
+  return [pts[0], pts[pts.length-1]];
+}
+
+function r2(n) { return Math.round(n*100)/100; }
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+function fmtDate(d) { return `${d.getDate()} ${MONTHS[d.getMonth()]}`; }
+
+// Parse a GPX string → raw point array  { lat, lon, ele, time }
+function parseGPXRaw(text) {
+  const doc = new DOMParser().parseFromString(text, 'text/xml');
+  if (doc.querySelector('parsererror')) throw new Error('Invalid XML');
+  const trkpts = [...doc.querySelectorAll('trkpt')];
+  if (!trkpts.length) throw new Error('No <trkpt> points found');
+  return trkpts.map(pt => ({
+    lat:  parseFloat(pt.getAttribute('lat')),
+    lon:  parseFloat(pt.getAttribute('lon')),
+    ele:  parseFloat(pt.querySelector('ele')?.textContent ?? '0') || 0,
+    time: pt.querySelector('time')?.textContent || null,
+  }));
+}
+
+// Compute all derived values from a (possibly concatenated) point array
+function computeFromPts(pts) {
+  const km   = Math.round(pts.slice(1).reduce((s,p,i) => s + haversineKm(pts[i], p), 0));
+  const elev = Math.round(pts.slice(1).reduce((s,p,i) => { const d=p.ele-pts[i].ele; return s+(d>=2?d:0); }, 0));
+
+  const times = pts.map(p=>p.time).filter(Boolean);
+  let dateStr='', year=new Date().getFullYear(), days=1, hasTimes=false;
+  if (times.length >= 2) {
+    hasTimes = true;
+    const first=new Date(times[0]), last=new Date(times[times.length-1]);
+    year  = first.getFullYear();
+    days  = Math.max(1, Math.round((last-first)/86400000) + 1);
+    dateStr = `${fmtDate(first)} — ${fmtDate(last)} ${year}`;
+  }
+
+  const waypoints = dpSimplify(pts.map(p=>[p.lat,p.lon]), 0.012).map(([la,lo])=>[r2(la),r2(lo)]);
+  const lats=waypoints.map(p=>p[0]), lons=waypoints.map(p=>p[1]);
+  const pin = [r2((Math.min(...lats)+Math.max(...lats))/2), r2((Math.min(...lons)+Math.max(...lons))/2)];
+
+  return { km, elev, year, days, dateStr, waypoints, pin, hasTimes, pointCount: pts.length };
+}
+
+function readFileText(file) {
+  return new Promise((res, rej) => {
+    const r = new FileReader();
+    r.onload = e => res(e.target.result);
+    r.onerror = rej;
+    r.readAsText(file);
+  });
+}
+
+// ── GPXImporter ────────────────────────────────────────────────────────────────
+
+function GPXImporter({ onApply }) {
+  const { useMemo } = React;
+  const [files, setFiles] = useState([]); // [{name, pts, km, elev, hasTimes, firstTime}]
+  const [err,   setErr]   = useState(null);
+  const [busy,  setBusy]  = useState(false);
+  const [over,  setOver]  = useState(false);
+  const inputRef = React.useRef(null);
+
+  const addFiles = async (fileList) => {
+    const incoming = [...fileList].filter(f => f.name.endsWith('.gpx'));
+    if (!incoming.length) { setErr('Select .gpx files'); return; }
+    setBusy(true); setErr(null);
+    const results = [];
+    for (const file of incoming) {
+      try {
+        const pts  = parseGPXRaw(await readFileText(file));
+        const km   = Math.round(pts.slice(1).reduce((s,p,i)=>s+haversineKm(pts[i],p), 0));
+        const elev = Math.round(pts.slice(1).reduce((s,p,i)=>{ const d=p.ele-pts[i].ele; return s+(d>=2?d:0); }, 0));
+        const times = pts.map(p=>p.time).filter(Boolean);
+        const firstTime = times.length ? new Date(times[0]) : null;
+        results.push({ name: file.name, pts, km, elev, hasTimes: times.length >= 2, firstTime });
+      } catch(ex) { setErr(`${file.name}: ${ex.message}`); }
+    }
+    setFiles(prev => {
+      const merged = [...prev, ...results];
+      // auto-sort chronologically when every file has timestamps
+      if (merged.length > 1 && merged.every(f => f.hasTimes))
+        merged.sort((a,b) => a.firstTime - b.firstTime);
+      return merged;
+    });
+    setBusy(false);
+  };
+
+  const move = (i, dir) => setFiles(p => {
+    const a=[...p]; [a[i],a[i+dir]]=[a[i+dir],a[i]]; return a;
+  });
+  const remove = (i) => setFiles(p => p.filter((_,j)=>j!==i));
+
+  // combined stats recomputed whenever the file list changes
+  const combined = useMemo(() => {
+    if (!files.length) return null;
+    return computeFromPts(files.flatMap(f => f.pts));
+  }, [files]);
+
+  const onInput  = e => addFiles(e.target.files);
+  const onDrop   = e => { e.preventDefault(); setOver(false); addFiles(e.dataTransfer.files); };
+  const onDragO  = e => { e.preventDefault(); setOver(true); };
+  const onDragL  = () => setOver(false);
+
+  return (
+    <div>
+      {/* Drop zone — always visible, adds more files if list already has entries */}
+      <div className={`gpx-drop${over?' over':''}`}
+        onClick={()=>inputRef.current.click()}
+        onDrop={onDrop} onDragOver={onDragO} onDragLeave={onDragL}>
+        <input ref={inputRef} type="file" accept=".gpx" multiple style={{display:'none'}} onChange={onInput} />
+        {busy ? 'Parsing…' : files.length ? '↑ Add more .gpx files' : '↑ Drop .gpx file(s) or click to choose'}
+      </div>
+
+      {err && <div className="ferr">✗ {err}</div>}
+
+      {files.length > 0 && (
+        <div className="gpx-preview">
+          {/* Per-file list with reorder controls */}
+          <div className="gpx-file-list">
+            {files.map((f, i) => (
+              <div key={i} className="gpx-file-row">
+                <span className="gpx-file-n">{i+1}</span>
+                <span className="gpx-file-name">{f.name}</span>
+                <span className="gpx-file-meta">{f.km} km · {f.elev.toLocaleString()} m↑ · {f.pts.length} pts</span>
+                <div className="gpx-file-btns">
+                  <button className="bi" onClick={()=>move(i,-1)} disabled={i===0} title="Move up">↑</button>
+                  <button className="bi" onClick={()=>move(i,+1)} disabled={i===files.length-1} title="Move down">↓</button>
+                  <button className="bi" onClick={()=>remove(i)} title="Remove">×</button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Combined totals */}
+          {combined && (<>
+            <div className="gpx-divider" />
+            <div className="gpx-stats">
+              <span><b>{combined.km}</b> km</span>
+              <span><b>{combined.elev.toLocaleString()}</b> m↑</span>
+              <span><b>{combined.days}</b> days</span>
+              {combined.hasTimes
+                ? <span><b>{combined.dateStr}</b></span>
+                : <span className="gpx-no-time">no timestamps — date/days not set</span>}
+              <span><b>{combined.waypoints.length}</b> waypoints ({combined.pointCount} pts total)</span>
+            </div>
+            <div className="gpx-acts">
+              <button className="bp" onClick={()=>{ onApply(combined); setFiles([]); }}>Apply to form</button>
+              <button className="bg" onClick={()=>setFiles([])}>Clear all</button>
+            </div>
+          </>)}
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── TripForm ───────────────────────────────────────────────────────────────────
+
+function TripForm({ trip, bikes, pilots, onChange }) {
+  const set = (k,v) => onChange({...trip,[k]:v});
+  const [wpKey, setWpKey] = useState(0);
+
+  const heroVal = trip.images?.hero    || '';
+  const galVal  = trip.images?.gallery || [];
+  const setImages = (hero, gallery) => {
+    const h=hero.trim(), g=gallery.filter(s=>s.trim());
+    if (!h && !g.length) { const {images,...rest}=trip; onChange(rest); }
+    else { const imgs={}; if(h) imgs.hero=h; if(g.length) imgs.gallery=g; onChange({...trip,images:imgs}); }
+  };
+
+  const applyGPX = (data) => {
+    onChange({
+      ...trip,
+      km:        data.km,
+      elev:      data.elev,
+      days:      data.days,
+      ...(data.hasTimes ? { date: data.dateStr, year: data.year } : {}),
+      waypoints: data.waypoints,
+      pin:       data.pin,
+    });
+    setWpKey(k => k + 1); // remount WaypointsEditor so it shows the imported waypoints
+  };
+
+  return (
+    <div>
+      <section>
+        <h3>Import from GPX <span className="hint">— fills distance, elevation, dates &amp; waypoints</span></h3>
+        <GPXImporter onApply={applyGPX} />
+      </section>
+      <section>
+        <h3>Metadata</h3>
+        <div className="grid">
+          <label className="wide">Title
+            <input type="text" value={trip.title} onChange={e=>set('title',e.target.value)} />
+          </label>
+          <label>Region
+            <input type="text" value={trip.region} placeholder="France / Spain" onChange={e=>set('region',e.target.value)} />
+          </label>
+          <label>Date string
+            <input type="text" value={trip.date} placeholder="12 Jun — 19 Jun 2024" onChange={e=>set('date',e.target.value)} />
+          </label>
+          <label>Year
+            <input type="number" value={trip.year} onChange={e=>set('year',parseInt(e.target.value)||0)} />
+          </label>
+          <label>Distance (km)
+            <input type="number" value={trip.km} onChange={e=>set('km',parseInt(e.target.value)||0)} />
+          </label>
+          <label>Days
+            <input type="number" value={trip.days} onChange={e=>set('days',parseInt(e.target.value)||0)} />
+          </label>
+          <label>Elevation gain (m)
+            <input type="number" value={trip.elev} onChange={e=>set('elev',parseInt(e.target.value)||0)} />
+          </label>
+          <label>Difficulty
+            <select value={trip.difficulty} onChange={e=>set('difficulty',e.target.value)}>
+              {DIFFICULTIES.map(d=><option key={d}>{d}</option>)}
+            </select>
+          </label>
+          <label className="wide">Motorcycle
+            <select value={trip.bike_id||''} onChange={e=>set('bike_id',e.target.value)}>
+              <option value="">— select —</option>
+              {bikes.map(b=><option key={b.id} value={b.id}>{b.make} {b.model}{b.year ? ` (${b.year})` : ''}</option>)}
+            </select>
+          </label>
+        </div>
+      </section>
+
+      {pilots.length > 0 && (
+        <section>
+          <h3>Riders</h3>
+          <div className="check-list">
+            {pilots.map(p=>(
+              <label key={p.id} className="check-row">
+                <input type="checkbox"
+                  checked={(trip.pilot_ids||[]).includes(p.id)}
+                  onChange={e=>{
+                    const ids=trip.pilot_ids||[];
+                    set('pilot_ids', e.target.checked ? [...ids,p.id] : ids.filter(id=>id!==p.id));
+                  }}
+                />
+                {p.name}{p.nationality ? ` · ${p.nationality}` : ''}
+              </label>
+            ))}
+          </div>
+        </section>
+      )}
+
+      <section>
+        <h3>Gear</h3>
+        <ListEditor items={trip.gear} onChange={v=>set('gear',v)} placeholder="e.g. Klim Badlands Pro" />
+      </section>
+
+      <section>
+        <h3>Story</h3>
+        <textarea rows={5} value={trip.story} onChange={e=>set('story',e.target.value)} />
+      </section>
+
+      <section>
+        <h3>Gallery captions</h3>
+        <ListEditor items={trip.gallery} onChange={v=>set('gallery',v)} placeholder="Caption" />
+      </section>
+
+      <section>
+        <h3>Images <span className="hint">— leave blank if none</span></h3>
+        <div style={{display:'flex',flexDirection:'column',gap:10}}>
+          <label>Hero image
+            <input type="text" value={heroVal} placeholder={`images/${trip.id}/hero.jpg`}
+              onChange={e=>setImages(e.target.value,galVal)} />
+          </label>
+          <label>Gallery images</label>
+          <ListEditor items={galVal} onChange={v=>setImages(heroVal,v)} placeholder={`images/${trip.id}/1.jpg`} />
+        </div>
+      </section>
+
+      <section>
+        <h3>Route</h3>
+        <div className="pin-row">
+          <label>Pin lat
+            <input type="number" step="0.01" value={trip.pin[0]} onChange={e=>set('pin',[parseFloat(e.target.value)||0,trip.pin[1]])} />
+          </label>
+          <label>Pin lon
+            <input type="number" step="0.01" value={trip.pin[1]} onChange={e=>set('pin',[trip.pin[0],parseFloat(e.target.value)||0])} />
+          </label>
+        </div>
+        <label>Waypoints <span className="hint">— JSON array of [lat, lon] pairs, applied on blur</span>
+          <WaypointsEditor key={wpKey} value={trip.waypoints} onChange={v=>set('waypoints',v)} />
+        </label>
+      </section>
+    </div>
+  );
+}
+
+// ── BikeForm ───────────────────────────────────────────────────────────────────
+
+function BikeForm({ bike, onChange }) {
+  const set = (k,v) => onChange({...bike,[k]:v});
+  return (
+    <div>
+      <section>
+        <h3>Specifications</h3>
+        <div className="grid">
+          <label>Make
+            <input type="text" value={bike.make} placeholder="BMW" onChange={e=>set('make',e.target.value)} />
+          </label>
+          <label>Model
+            <input type="text" value={bike.model} placeholder="R 1250 GS Adventure" onChange={e=>set('model',e.target.value)} />
+          </label>
+          <label>Year
+            <input type="number" value={bike.year} onChange={e=>set('year',parseInt(e.target.value)||0)} />
+          </label>
+          <label>Type
+            <select value={bike.type} onChange={e=>set('type',e.target.value)}>
+              {BIKE_TYPES.map(t=><option key={t}>{t}</option>)}
+            </select>
+          </label>
+          <label>Engine (cc)
+            <input type="number" value={bike.cc} onChange={e=>set('cc',parseInt(e.target.value)||0)} />
+          </label>
+          <label>Power (hp)
+            <input type="number" value={bike.power_hp} onChange={e=>set('power_hp',parseInt(e.target.value)||0)} />
+          </label>
+          <label>Weight kg (wet)
+            <input type="number" value={bike.weight_kg} onChange={e=>set('weight_kg',parseInt(e.target.value)||0)} />
+          </label>
+          <label>Color / trim
+            <input type="text" value={bike.color} onChange={e=>set('color',e.target.value)} />
+          </label>
+        </div>
+      </section>
+      <section>
+        <h3>Notes</h3>
+        <textarea rows={3} value={bike.notes} onChange={e=>set('notes',e.target.value)} />
+      </section>
+      <section>
+        <h3>Image <span className="hint">— path relative to project root</span></h3>
+        <input type="text" value={bike.image} placeholder="images/bikes/r1250gs.jpg" onChange={e=>set('image',e.target.value)} />
+      </section>
+    </div>
+  );
+}
+
+// ── PilotForm ──────────────────────────────────────────────────────────────────
+
+function PilotForm({ pilot, onChange }) {
+  const set = (k,v) => onChange({...pilot,[k]:v});
+  return (
+    <div>
+      <section>
+        <h3>Profile</h3>
+        <div className="grid">
+          <label>Name
+            <input type="text" value={pilot.name} onChange={e=>set('name',e.target.value)} />
+          </label>
+          <label>Nationality
+            <input type="text" value={pilot.nationality} onChange={e=>set('nationality',e.target.value)} />
+          </label>
+          <label>Riding since
+            <input type="number" value={pilot.since} onChange={e=>set('since',parseInt(e.target.value)||0)} />
+          </label>
+          <label>License class
+            <select value={pilot.license} onChange={e=>set('license',e.target.value)}>
+              {LICENSES.map(l=><option key={l}>{l}</option>)}
+            </select>
+          </label>
+        </div>
+      </section>
+      <section>
+        <h3>Bio</h3>
+        <textarea rows={4} value={pilot.bio} onChange={e=>set('bio',e.target.value)} />
+      </section>
+      <section>
+        <h3>Image <span className="hint">— path relative to project root</span></h3>
+        <input type="text" value={pilot.image} placeholder="images/pilots/alexis.jpg" onChange={e=>set('image',e.target.value)} />
+      </section>
+    </div>
+  );
+}
+
+// ── App ────────────────────────────────────────────────────────────────────────
+
+function App() {
+  const [trips,  setTrips]  = useState([]);
+  const [bikes,  setBikes]  = useState([]);
+  const [pilots, setPilots] = useState([]);
+  const [tab,    setTab]    = useState('trips');
+
+  const [selTrip,  setSelTrip]  = useState(null);
+  const [selBike,  setSelBike]  = useState(null);
+  const [selPilot, setSelPilot] = useState(null);
+
+  const [showExport, setShowExport] = useState(false);
+  const [copied,     setCopied]     = useState(false);
+  const [loading,    setLoading]    = useState(true);
+  const [loadErr,    setLoadErr]    = useState(null);
+
+  useEffect(()=>{
+    fetch('data/roadbook.json')
+      .then(r=>{ if(!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+      .then(d=>{
+        setTrips(d.trips||[]);
+        setBikes(d.bikes||[]);
+        setPilots(d.pilots||[]);
+        setSelTrip(d.trips?.[0]?.id||null);
+        setSelBike(d.bikes?.[0]?.id||null);
+        setSelPilot(d.pilots?.[0]?.id||null);
+        setLoading(false);
+      })
+      .catch(e=>{ setLoadErr(e.message); setLoading(false); });
+  },[]);
+
+  // ── trip ops ──
+  const updateTrip  = useCallback(u => setTrips(p=>p.map(t=>t.id===u.id?u:t)), []);
+  const addTrip     = () => setTrips(p=>{ const t=blankTrip(p); setSelTrip(t.id); return [...p,t]; });
+  const deleteTrip  = id => setTrips(p=>{ const n=renumber(p.filter(t=>t.id!==id)); setSelTrip(n[0]?.id||null); return n; });
+
+  // ── bike ops (no renumber — trips reference bike IDs) ──
+  const updateBike  = useCallback(u => setBikes(p=>p.map(b=>b.id===u.id?u:b)), []);
+  const addBike     = () => setBikes(p=>{ const b=blankBike(p); setSelBike(b.id); return [...p,b]; });
+  const deleteBike  = id => setBikes(p=>{ const n=p.filter(b=>b.id!==id); setSelBike(n[0]?.id||null); return n; });
+
+  // ── pilot ops (no renumber — trips reference pilot IDs) ──
+  const updatePilot = useCallback(u => setPilots(p=>p.map(q=>q.id===u.id?u:q)), []);
+  const addPilot    = () => setPilots(p=>{ const q=blankPilot(p); setSelPilot(q.id); return [...p,q]; });
+  const deletePilot = id => setPilots(p=>{ const n=p.filter(q=>q.id!==id); setSelPilot(n[0]?.id||null); return n; });
+
+  const buildJSON = () => JSON.stringify({ bikes, pilots, trips, stats: computeStats(trips) }, null, 2);
+
+  const copyJSON = () => {
+    const text = buildJSON();
+    const done = () => { setCopied(true); setTimeout(()=>setCopied(false), 2000); };
+    if (navigator.clipboard) navigator.clipboard.writeText(text).then(done);
+    else { const el=document.querySelector('.mo-ta'); if(el){el.select();document.execCommand('copy');} done(); }
+  };
+
+  const stats = computeStats(trips);
+
+  if (loading) return <div style={{height:'100vh'}}><div className="loading">Loading roadbook.json…</div></div>;
+  if (loadErr) return (
+    <div style={{height:'100vh'}}>
+      <div className="loading err-txt">Failed: {loadErr}<small>Use a local server — file:// won't work</small></div>
+    </div>
+  );
+
+  const selectedTrip  = trips.find(t=>t.id===selTrip)   || null;
+  const selectedBike  = bikes.find(b=>b.id===selBike)   || null;
+  const selectedPilot = pilots.find(p=>p.id===selPilot) || null;
+
+  // trip count per bike / pilot for sidebar
+  const bikeTrips  = id => trips.filter(t=>t.bike_id===id).length;
+  const pilotTrips = id => trips.filter(t=>(t.pilot_ids||[]).includes(id)).length;
+
+  return (
+    <div style={{display:'flex',flexDirection:'column',height:'100vh'}}>
+
+      {/* Header */}
+      <header className="hdr">
+        <span className="brand">ROADBOOK ADMIN</span>
+        <div className="tabs">
+          <button className={`tab${tab==='trips'  ?' on':''}`} onClick={()=>setTab('trips')}>
+            Trips ({trips.length})
+          </button>
+          <button className={`tab${tab==='bikes'  ?' on':''}`} onClick={()=>setTab('bikes')}>
+            Bikes ({bikes.length})
+          </button>
+          <button className={`tab${tab==='pilots' ?' on':''}`} onClick={()=>setTab('pilots')}>
+            Pilots ({pilots.length})
+          </button>
+        </div>
+        <span className="hdr-stats">
+          {stats.trips} trips · {stats.total_km.toLocaleString()} km · {stats.countries} countries
+        </span>
+        <button className="bp" onClick={()=>{setShowExport(true);setCopied(false);}}>Export JSON</button>
+      </header>
+
+      <div className="lay">
+
+        {/* ── Trips sidebar ── */}
+        {tab==='trips' && (
+          <aside className="side">
+            <div className="side-head">Trips ({trips.length})</div>
+            <div className="list">
+              {trips.map(t=>(
+                <div key={t.id} className={`item${selTrip===t.id?' on':''}`} onClick={()=>setSelTrip(t.id)}>
+                  <span className="item-tag">{t.n}</span>
+                  <span className="item-name">{t.title||'(untitled)'}</span>
+                </div>
+              ))}
+            </div>
+            <div className="side-foot"><button className="bn" onClick={addTrip}>+ New trip</button></div>
+          </aside>
+        )}
+
+        {/* ── Bikes sidebar ── */}
+        {tab==='bikes' && (
+          <aside className="side">
+            <div className="side-head">Bikes ({bikes.length})</div>
+            <div className="list">
+              {bikes.map(b=>(
+                <div key={b.id} className={`item${selBike===b.id?' on':''}`} onClick={()=>setSelBike(b.id)}>
+                  <span className="item-tag">{b.id}</span>
+                  <span className="item-name">{b.make||'?'} {b.model||'(unnamed)'}</span>
+                  <span className="item-count">{bikeTrips(b.id)}t</span>
+                </div>
+              ))}
+            </div>
+            <div className="side-foot"><button className="bn" onClick={addBike}>+ New bike</button></div>
+          </aside>
+        )}
+
+        {/* ── Pilots sidebar ── */}
+        {tab==='pilots' && (
+          <aside className="side">
+            <div className="side-head">Pilots ({pilots.length})</div>
+            <div className="list">
+              {pilots.map(p=>(
+                <div key={p.id} className={`item${selPilot===p.id?' on':''}`} onClick={()=>setSelPilot(p.id)}>
+                  <span className="item-tag">{p.id}</span>
+                  <span className="item-name">{p.name||'(unnamed)'}</span>
+                  <span className="item-count">{pilotTrips(p.id)}t</span>
+                </div>
+              ))}
+            </div>
+            <div className="side-foot"><button className="bn" onClick={addPilot}>+ New pilot</button></div>
+          </aside>
+        )}
+
+        {/* ── Main area ── */}
+        <main className="main">
+
+          {/* Trips */}
+          {tab==='trips' && (selectedTrip ? (
+            <div className="wrap">
+              <div className="fhead">
+                <h2>{selectedTrip.title||'(untitled)'}<span className="fid">{selectedTrip.id}</span></h2>
+                <button className="bd" onClick={()=>deleteTrip(selectedTrip.id)}>Delete trip</button>
+              </div>
+              <TripForm key={selectedTrip.id} trip={selectedTrip} bikes={bikes} pilots={pilots} onChange={updateTrip} />
+            </div>
+          ) : (
+            <div className="empty">
+              <span>No trip selected</span>
+              <button className="bg" onClick={addTrip}>+ Create first trip</button>
+            </div>
+          ))}
+
+          {/* Bikes */}
+          {tab==='bikes' && (selectedBike ? (
+            <div className="wrap">
+              <div className="fhead">
+                <h2>
+                  {selectedBike.make||'(make)'} {selectedBike.model||'(model)'}
+                  <span className="fid">{selectedBike.id}</span>
+                </h2>
+                <button className="bd" onClick={()=>deleteBike(selectedBike.id)}>Delete bike</button>
+              </div>
+              <BikeForm key={selectedBike.id} bike={selectedBike} onChange={updateBike} />
+            </div>
+          ) : (
+            <div className="empty">
+              <span>No bike selected</span>
+              <button className="bg" onClick={addBike}>+ Add first bike</button>
+            </div>
+          ))}
+
+          {/* Pilots */}
+          {tab==='pilots' && (selectedPilot ? (
+            <div className="wrap">
+              <div className="fhead">
+                <h2>{selectedPilot.name||'(unnamed)'}<span className="fid">{selectedPilot.id}</span></h2>
+                <button className="bd" onClick={()=>deletePilot(selectedPilot.id)}>Delete pilot</button>
+              </div>
+              <PilotForm key={selectedPilot.id} pilot={selectedPilot} onChange={updatePilot} />
+            </div>
+          ) : (
+            <div className="empty">
+              <span>No pilot selected</span>
+              <button className="bg" onClick={addPilot}>+ Add first pilot</button>
+            </div>
+          ))}
+
+        </main>
+      </div>
+
+      {/* Export modal */}
+      {showExport && (
+        <div className="ov" onClick={()=>setShowExport(false)}>
+          <div className="mo" onClick={e=>e.stopPropagation()}>
+            <div className="mo-h">
+              <h3>data/roadbook.json</h3>
+              <div className="mo-acts">
+                <button className={copied?'bcp':'bp'} onClick={copyJSON}>
+                  {copied ? '✓ Copied!' : 'Copy to clipboard'}
+                </button>
+                <button className="bi" onClick={()=>setShowExport(false)}>×</button>
+              </div>
+            </div>
+            <textarea className="mo-ta" readOnly value={buildJSON()} />
+            <p className="mo-ft">
+              Paste into <code>data/roadbook.json</code> to save.
+              Stats are recomputed automatically.
+            </p>
+          </div>
+        </div>
+      )}
+
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

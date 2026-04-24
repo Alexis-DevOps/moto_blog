@@ -37,11 +37,35 @@ function App() {
   const hoveredTrip = TRIPS.find(t => t.id === hoverId) || null;
   const openTrip    = TRIPS.find(t => t.id === openId)  || null;
 
+  function computePinPos(map, trip) {
+    const pt = map.project([trip.pin[1], trip.pin[0]]);
+    const wpts = trip.waypoints || [];
+    let preferRight = true;
+    let routeEdgeX = pt.x;
+    let altRouteEdgeX = pt.x;
+    if (wpts.length > 1) {
+      const proj = wpts.map(([la, lo]) => map.project([lo, la]));
+      const near = proj.filter(p => Math.abs(p.y - pt.y) < 86);
+      const src = near.length > 2 ? near : proj;
+      const leftPts  = src.filter(p => p.x < pt.x);
+      const rightPts = src.filter(p => p.x > pt.x);
+      preferRight = rightPts.length <= leftPts.length;
+      // furthest waypoint on the chosen side — card must start beyond it
+      routeEdgeX = preferRight
+        ? (rightPts.length ? Math.max(...rightPts.map(p => p.x)) : pt.x)
+        : (leftPts.length  ? Math.min(...leftPts.map(p => p.x))  : pt.x);
+      // also store the edge for the fallback side (used when preferred side overflows viewport)
+      altRouteEdgeX = preferRight
+        ? (leftPts.length  ? Math.min(...leftPts.map(p => p.x))  : pt.x)
+        : (rightPts.length ? Math.max(...rightPts.map(p => p.x)) : pt.x);
+    }
+    return { x: pt.x, y: pt.y, preferRight, routeEdgeX, altRouteEdgeX };
+  }
+
   // Project hovered pin to screen pixels via MapLibre
   useEffect(() => {
     if (!hoveredTrip || !mapRef.current) return;
-    const pt = mapRef.current.project([hoveredTrip.pin[1], hoveredTrip.pin[0]]);
-    setPinPos({ x: pt.x, y: pt.y });
+    setPinPos(computePinPos(mapRef.current, hoveredTrip));
   }, [hoverId]); // eslint-disable-line
 
   // Also update on map move while hovering
@@ -50,8 +74,7 @@ function App() {
     if (!map) return;
     const update = () => {
       if (!hoveredTrip) return;
-      const pt = map.project([hoveredTrip.pin[1], hoveredTrip.pin[0]]);
-      setPinPos({ x: pt.x, y: pt.y });
+      setPinPos(computePinPos(map, hoveredTrip));
     };
     map.on('move', update);
     return () => map.off('move', update);
@@ -110,16 +133,21 @@ function App() {
             <b>{STATS.total_days}</b>
             <i>days on road</i>
           </div>
+          {STATS.total_elev > 0 && <>
           <div className="divider" />
           <div className="stat">
             <b>{(STATS.total_elev/1000).toFixed(1)}k</b>
             <i>m elev. gain</i>
           </div>
+          </>}
         </div>
 
         <div className="meta-cluster">
           <div className="coord-chip">
-            <span>{theme === 'dark' ? 'DARK' : 'LIGHT'}</span>
+            <span
+              style={{ cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '3px' }}
+              onClick={() => setTweaks({ theme: theme === 'dark' ? 'light' : 'dark' })}
+            >{theme === 'dark' ? 'DARK' : 'LIGHT'}</span>
             <span className="sep">·</span>
             <span>EUR</span>
             <span className="sep">·</span>
@@ -158,6 +186,9 @@ function App() {
           y={pinPos.y}
           W={sz.w}
           H={sz.h}
+          preferRight={pinPos.preferRight !== false}
+          routeEdgeX={pinPos.routeEdgeX ?? pinPos.x}
+          altRouteEdgeX={pinPos.altRouteEdgeX ?? pinPos.x}
         />
       )}
 

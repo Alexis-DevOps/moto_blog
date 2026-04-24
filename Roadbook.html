@@ -22,7 +22,7 @@
 <script>
 window.__dataReady = fetch('data/roadbook.json')
   .then(function(r) { return r.json(); })
-  .then(function(d) { window.TRIPS = d.trips; window.STATS = d.stats; });
+  .then(function(d) { window.TRIPS = d.trips; window.STATS = d.stats; window.BIKES = d.bikes || []; window.PILOTS = d.pilots || []; });
 </script>
 
 <script src="components/MapStyle.js"></script>
