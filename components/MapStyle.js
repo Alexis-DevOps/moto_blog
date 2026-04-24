@@ -9,40 +9,52 @@
 //   Both are drop-in style-URL replacements — remove the custom sources block and use their
 //   style directly, then layer your rb-* layers on top in the style.load callback.
 
-const MAPTILER_KEY = 'RScRJ13Jj5RMTB1vogJ7';
+// Key loaded from config.js (gitignored). Falls back to empty string so the
+// app still starts — tiles will 401 until a valid key is provided.
+const MAPTILER_KEY = (typeof window !== 'undefined' && window.MAPTILER_KEY) || '';
 
 const DARK = {
-  sea:        '#06090d',
-  seaDeep:    '#0a0f14',
-  land:       '#14202b',
-  land2:      '#1a2936',
-  coastline:  '#3d5a76',
-  contour:    '#2a4157',
-  contourHi:  '#3a5a78',
-  grid:       'rgba(120,160,200,0.12)',
-  text:       '#8aa4bf',
-  textDim:    '#4d6680',
-  accent:     '#e86a33',
-  hillShadow: '#040810',
-  hillHigh:   '#1e3040',
-  water:      '#080c12',
+  sea:          '#06090d',
+  seaDeep:      '#0a0f14',
+  land:         '#14202b',
+  land2:        '#1a2936',
+  coastline:    '#3d5a76',
+  contour:      '#2e4a6a',
+  contourHi:    '#4a7aaa',
+  grid:         'rgba(120,160,200,0.12)',
+  text:         '#8aa4bf',
+  textDim:      '#4d6680',
+  accent:       '#e86a33',
+  hillShadow:   '#020406',
+  hillHigh:     '#2e4f70',
+  water:        '#080c12',
+  roadMotorway: '#3e6a8a',
+  roadPrimary:  '#3a6080',
+  roadSecondary:'#2a4558',
+  roadMinor:    '#1e3242',
+  roadCasing:   '#05101a',
 };
 
 const LIGHT = {
-  sea:        '#e8eef2',
-  seaDeep:    '#dde6ec',
-  land:       '#f4ede0',
-  land2:      '#ece3d0',
-  coastline:  '#6b5a3e',
-  contour:    '#c9b99a',
-  contourHi:  '#b19b74',
-  grid:       'rgba(107,90,62,0.14)',
-  text:       '#6b5a3e',
-  textDim:    '#a9997a',
-  accent:     '#e86a33',
-  hillShadow: '#c5b49a',
-  hillHigh:   '#f8f0e0',
-  water:      '#c8d8e4',
+  sea:          '#e8eef2',
+  seaDeep:      '#dde6ec',
+  land:         '#f4ede0',
+  land2:        '#ece3d0',
+  coastline:    '#6b5a3e',
+  contour:      '#b8a27a',
+  contourHi:    '#8c6e40',
+  grid:         'rgba(107,90,62,0.14)',
+  text:         '#6b5a3e',
+  textDim:      '#a9997a',
+  accent:       '#e86a33',
+  hillShadow:   '#a08860',
+  hillHigh:     '#fdf8f0',
+  water:        '#c8d8e4',
+  roadMotorway: '#6090b8',
+  roadPrimary:  '#5880a8',
+  roadSecondary:'#7898b8',
+  roadMinor:    '#98b0c8',
+  roadCasing:   '#e8e0d0',
 };
 
 function buildStyle(theme, maptilerKey) {
@@ -52,7 +64,6 @@ function buildStyle(theme, maptilerKey) {
   return {
     version: 8,
     glyphs: `https://api.maptiler.com/fonts/{fontstack}/{range}.pbf?key=${key}`,
-    sprite: `https://api.maptiler.com/maps/outdoor-v2/sprite?key=${key}`,
     sources: {
       maptiler: {
         type: 'vector',
@@ -64,10 +75,6 @@ function buildStyle(theme, maptilerKey) {
         tileSize: 256,
         encoding: 'mapbox',
       },
-    },
-    terrain: {
-      source: 'hillshade',
-      exaggeration: 0,
     },
     layers: [
       // ── background / sea ──────────────────────────────────────────
@@ -86,7 +93,7 @@ function buildStyle(theme, maptilerKey) {
           'hillshade-shadow-color': C.hillShadow,
           'hillshade-highlight-color': C.hillHigh,
           'hillshade-illumination-direction': 315,
-          'hillshade-exaggeration': theme === 'dark' ? 0.38 : 0.28,
+          'hillshade-exaggeration': theme === 'dark' ? 0.68 : 0.55,
           'hillshade-accent-color': C.land,
         },
       },
@@ -109,12 +116,12 @@ function buildStyle(theme, maptilerKey) {
         paint: {
           'fill-color': [
             'match', ['get', 'class'],
-            ['forest', 'grass', 'scrub'], theme === 'dark' ? '#162330' : '#eae5d5',
+            ['forest', 'grass', 'scrub'], theme === 'dark' ? '#1a3a28' : '#d8e8cc',
             ['sand', 'beach'],            theme === 'dark' ? '#1c2a1c' : '#e8e0c8',
             ['ice', 'glacier'],           theme === 'dark' ? '#1d2e3a' : '#edf2f5',
             C.land,
           ],
-          'fill-opacity': 0.7,
+          'fill-opacity': 0.65,
         },
       },
 
@@ -154,8 +161,8 @@ function buildStyle(theme, maptilerKey) {
         filter: ['!=', ['get', 'nth_line'], 5],
         paint: {
           'line-color': C.contour,
-          'line-width': 0.5,
-          'line-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.3, 9, 0.6],
+          'line-width': 0.7,
+          'line-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.55, 9, 0.85],
         },
       },
       {
@@ -167,8 +174,95 @@ function buildStyle(theme, maptilerKey) {
         filter: ['==', ['get', 'nth_line'], 5],
         paint: {
           'line-color': C.contourHi,
-          'line-width': 0.9,
-          'line-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.4, 9, 0.75],
+          'line-width': 1.2,
+          'line-opacity': ['interpolate', ['linear'], ['zoom'], 5, 0.7, 9, 0.95],
+        },
+      },
+
+      // ── roads ─────────────────────────────────────────────────────
+      // Tracks & unpaved — dashed, high zoom only
+      {
+        id: 'rb-road-track',
+        type: 'line',
+        source: 'maptiler',
+        'source-layer': 'transportation',
+        minzoom: 10,
+        filter: ['in', ['get', 'class'], ['literal', ['track', 'path']]],
+        paint: {
+          'line-color': C.roadMinor,
+          'line-width': 0.5,
+          'line-dasharray': [3, 3],
+          'line-opacity': 0.5,
+        },
+      },
+      // Minor & service roads
+      {
+        id: 'rb-road-minor',
+        type: 'line',
+        source: 'maptiler',
+        'source-layer': 'transportation',
+        minzoom: 9,
+        filter: ['in', ['get', 'class'], ['literal', ['minor', 'service']]],
+        paint: {
+          'line-color': C.roadMinor,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 9, 0.35, 14, 1.2],
+          'line-opacity': 0.6,
+        },
+      },
+      // Tertiary
+      {
+        id: 'rb-road-tertiary',
+        type: 'line',
+        source: 'maptiler',
+        'source-layer': 'transportation',
+        minzoom: 7,
+        filter: ['==', ['get', 'class'], 'tertiary'],
+        paint: {
+          'line-color': C.roadSecondary,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 7, 0.4, 14, 1.8],
+          'line-opacity': 0.65,
+        },
+      },
+      // Secondary
+      {
+        id: 'rb-road-secondary',
+        type: 'line',
+        source: 'maptiler',
+        'source-layer': 'transportation',
+        minzoom: 5,
+        filter: ['==', ['get', 'class'], 'secondary'],
+        paint: {
+          'line-color': C.roadSecondary,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 5, 0.5, 14, 2.2],
+          'line-opacity': 0.7,
+        },
+      },
+      // Primary + trunk
+      {
+        id: 'rb-road-primary',
+        type: 'line',
+        source: 'maptiler',
+        'source-layer': 'transportation',
+        minzoom: 4,
+        filter: ['in', ['get', 'class'], ['literal', ['primary', 'trunk']]],
+        paint: {
+          'line-color': C.roadPrimary,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 4, 0.55, 14, 3],
+          'line-opacity': 0.72,
+        },
+      },
+      // Motorway — same weight as primary, just slightly wider
+      {
+        id: 'rb-road-motorway',
+        type: 'line',
+        source: 'maptiler',
+        'source-layer': 'transportation',
+        minzoom: 3,
+        filter: ['==', ['get', 'class'], 'motorway'],
+        paint: {
+          'line-color': C.roadMotorway,
+          'line-width': ['interpolate', ['linear'], ['zoom'], 3, 0.6, 14, 3.5],
+          'line-opacity': 0.72,
         },
       },
 

@@ -5,12 +5,13 @@ const DEFAULTS = /*EDITMODE-BEGIN*/{
   "theme": "dark",
   "showPreviewCard": true,
   "showRouteOnHover": true,
+  "showAllRoutes": false,
   "mapBase": "outdoor"
 }/*EDITMODE-END*/;
 
 function App() {
   const [tweaks, setTweaks] = useTweaks(DEFAULTS);
-  const { theme, showPreviewCard, showRouteOnHover } = tweaks;
+  const { theme, showPreviewCard, showRouteOnHover, showAllRoutes } = tweaks;
 
   const [hoverId, setHoverId] = useState(null);
   const [openId, setOpenId] = useState(null);
@@ -36,6 +37,61 @@ function App() {
 
   const hoveredTrip = TRIPS.find(t => t.id === hoverId) || null;
   const openTrip    = TRIPS.find(t => t.id === openId)  || null;
+
+  // ── Image preloading ──────────────────────────────────────────────────────
+  const preloadedRef = useRef(new Set());
+  function preloadImg(url) {
+    if (!url || preloadedRef.current.has(url)) return;
+    preloadedRef.current.add(url);
+    const i = new Image(); i.src = url;
+  }
+
+  // Idle-time: load all hero images while browser is free
+  useEffect(() => {
+    const allBikes = typeof BIKES !== 'undefined' ? BIKES : [];
+    const run = () => {
+      TRIPS.forEach(t => {
+        preloadImg(t.images?.hero);
+        (t.riders || []).forEach(r => {
+          const bike = allBikes.find(b => b.id === r.bike_id);
+          preloadImg(bike?.image);
+        });
+      });
+    };
+    if (typeof requestIdleCallback !== 'undefined') {
+      const id = requestIdleCallback(run, { timeout: 3000 });
+      return () => cancelIdleCallback(id);
+    }
+    const id = setTimeout(run, 2000);
+    return () => clearTimeout(id);
+  }, []); // eslint-disable-line
+
+  // Proximity preload — fires as the cursor approaches a pin, not just on hover
+  useEffect(() => {
+    const RADIUS = 180; // px — starts loading well before mouseenter
+    const R2 = RADIUS * RADIUS;
+    const allBikes = typeof BIKES !== 'undefined' ? BIKES : [];
+
+    const onMove = (e) => {
+      const map = mapRef.current;
+      if (!map) return;
+      TRIPS.forEach(t => {
+        const pt = map.project([t.pin[1], t.pin[0]]);
+        const dx = e.clientX - pt.x;
+        const dy = e.clientY - pt.y;
+        if (dx * dx + dy * dy > R2) return;
+        preloadImg(t.images?.hero);
+        (t.images?.gallery || []).forEach(preloadImg);
+        (t.riders || []).forEach(r => {
+          const bike = allBikes.find(b => b.id === r.bike_id);
+          preloadImg(bike?.image);
+        });
+      });
+    };
+
+    window.addEventListener('mousemove', onMove, { passive: true });
+    return () => window.removeEventListener('mousemove', onMove);
+  }, []); // eslint-disable-line
 
   function computePinPos(map, trip) {
     const pt = map.project([trip.pin[1], trip.pin[0]]);
@@ -89,6 +145,7 @@ function App() {
           hoverId={hoverId}
           openId={openId}
           showRouteOnHover={showRouteOnHover}
+          showAllRoutes={showAllRoutes}
           onPinEnter={(id) => setHoverId(id)}
           onPinLeave={() => setHoverId(null)}
           onPinClick={(id) => setOpenId(id)}
@@ -149,7 +206,10 @@ function App() {
               onClick={() => setTweaks({ theme: theme === 'dark' ? 'light' : 'dark' })}
             >{theme === 'dark' ? 'DARK' : 'LIGHT'}</span>
             <span className="sep">·</span>
-            <span>EUR</span>
+            <span
+              style={{ cursor: 'pointer', textDecoration: 'underline', textUnderlineOffset: '3px', opacity: showAllRoutes ? 1 : 0.45 }}
+              onClick={() => setTweaks({ showAllRoutes: !showAllRoutes })}
+            >TRACES</span>
             <span className="sep">·</span>
             <span>{STATS.years[0]}–{STATS.years[STATS.years.length-1]}</span>
           </div>

@@ -128,14 +128,10 @@ input:focus, select:focus, textarea:focus { border-color: var(--accent); }
 textarea { resize: vertical; min-height: 80px; }
 select { cursor: pointer; }
 
-/* ── Checkbox rows (pilot multi-select) ── */
-.check-list { display: flex; flex-direction: column; gap: 8px; }
-.check-row {
-  display: flex !important; flex-direction: row !important;
-  align-items: center; gap: 8px; cursor: pointer;
-  font-size: 13px; color: var(--text); font-weight: 400; letter-spacing: 0;
-}
-.check-row input[type="checkbox"] { width: auto; accent-color: var(--accent); cursor: pointer; }
+/* ── Riders editor ── */
+.riders-list { display: flex; flex-direction: column; gap: 6px; }
+.rider-row { display: flex; gap: 6px; align-items: center; }
+.rider-row select { flex: 1; }
 
 /* ── List editor ── */
 .le { display: flex; flex-direction: column; gap: 6px; }
@@ -256,7 +252,7 @@ function nextId(items, prefix) {
 
 function blankTrip(trips) {
   const n = String(trips.length+1).padStart(2,'0');
-  return { id:`t${n}`, n, title:'', region:'', date:'', year:new Date().getFullYear(), km:0, days:0, elev:0, difficulty:'Moderate', bike_id:'', pilot_ids:[], gear:[], story:'', gallery:[], waypoints:[], pin:[0,0] };
+  return { id:`t${n}`, n, title:'', region:'', date:'', year:new Date().getFullYear(), km:0, days:0, elev:0, difficulty:'Moderate', riders:[], gear:[], story:'', gallery:[], waypoints:[], pin:[0,0] };
 }
 function blankBike(bikes) {
   return { id:nextId(bikes,'bike'), make:'', model:'', year:new Date().getFullYear(), type:'Adventure', cc:0, power_hp:0, weight_kg:0, color:'', notes:'', image:'' };
@@ -484,6 +480,32 @@ function GPXImporter({ onApply }) {
 
 // ── TripForm ───────────────────────────────────────────────────────────────────
 
+function RidersEditor({ riders, bikes, pilots, onChange }) {
+  const add    = () => onChange([...riders, { pilot_id: '', bike_id: '' }]);
+  const remove = (i) => onChange(riders.filter((_,j) => j !== i));
+  const set    = (i, key, val) => onChange(riders.map((r,j) => j===i ? {...r,[key]:val} : r));
+  return (
+    <div>
+      <div className="riders-list">
+        {riders.map((r, i) => (
+          <div key={i} className="rider-row">
+            <select value={r.pilot_id} onChange={e=>set(i,'pilot_id',e.target.value)}>
+              <option value="">— pilot —</option>
+              {pilots.map(p=><option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+            <select value={r.bike_id} onChange={e=>set(i,'bike_id',e.target.value)}>
+              <option value="">— bike —</option>
+              {bikes.map(b=><option key={b.id} value={b.id}>{b.make} {b.model}{b.year?` (${b.year})`:''}</option>)}
+            </select>
+            <button className="bi" onClick={()=>remove(i)}>×</button>
+          </div>
+        ))}
+      </div>
+      <button className="ba" style={{marginTop: riders.length ? 6 : 0}} onClick={add}>+ Add rider</button>
+    </div>
+  );
+}
+
 function TripForm({ trip, bikes, pilots, onChange }) {
   const set = (k,v) => onChange({...trip,[k]:v});
   const [wpKey, setWpKey] = useState(0);
@@ -544,34 +566,18 @@ function TripForm({ trip, bikes, pilots, onChange }) {
               {DIFFICULTIES.map(d=><option key={d}>{d}</option>)}
             </select>
           </label>
-          <label className="wide">Motorcycle
-            <select value={trip.bike_id||''} onChange={e=>set('bike_id',e.target.value)}>
-              <option value="">— select —</option>
-              {bikes.map(b=><option key={b.id} value={b.id}>{b.make} {b.model}{b.year ? ` (${b.year})` : ''}</option>)}
-            </select>
-          </label>
         </div>
       </section>
 
-      {pilots.length > 0 && (
-        <section>
-          <h3>Riders</h3>
-          <div className="check-list">
-            {pilots.map(p=>(
-              <label key={p.id} className="check-row">
-                <input type="checkbox"
-                  checked={(trip.pilot_ids||[]).includes(p.id)}
-                  onChange={e=>{
-                    const ids=trip.pilot_ids||[];
-                    set('pilot_ids', e.target.checked ? [...ids,p.id] : ids.filter(id=>id!==p.id));
-                  }}
-                />
-                {p.name}{p.nationality ? ` · ${p.nationality}` : ''}
-              </label>
-            ))}
-          </div>
-        </section>
-      )}
+      <section>
+        <h3>Crew <span className="hint">— pilot + bike per rider</span></h3>
+        <RidersEditor
+          riders={trip.riders||[]}
+          bikes={bikes}
+          pilots={pilots}
+          onChange={v=>set('riders',v)}
+        />
+      </section>
 
       <section>
         <h3>Gear</h3>
@@ -774,8 +780,8 @@ function App() {
   const selectedPilot = pilots.find(p=>p.id===selPilot) || null;
 
   // trip count per bike / pilot for sidebar
-  const bikeTrips  = id => trips.filter(t=>t.bike_id===id).length;
-  const pilotTrips = id => trips.filter(t=>(t.pilot_ids||[]).includes(id)).length;
+  const bikeTrips  = id => trips.filter(t=>(t.riders||[]).some(r=>r.bike_id===id)).length;
+  const pilotTrips = id => trips.filter(t=>(t.riders||[]).some(r=>r.pilot_id===id)).length;
 
   return (
     <div style={{display:'flex',flexDirection:'column',height:'100vh'}}>

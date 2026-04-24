@@ -6,14 +6,33 @@ const EMPTY_FC = { type: 'FeatureCollection', features: [] };
 
 // ---------- map layer helpers ----------
 
-function addRouteLayers(map) {
-  ['rb-trip-route-glow', 'rb-trip-route'].forEach(id => {
+function addRouteLayers(map, trips, showAll) {
+  ['rb-trip-route', 'rb-trip-route-glow', 'rb-trips-all'].forEach(id => {
     if (map.getLayer(id)) map.removeLayer(id);
   });
   if (map.getSource('trips-active')) map.removeSource('trips-active');
+  if (map.getSource('trips-all'))    map.removeSource('trips-all');
 
+  // All-routes layer (drawn first, so hover route sits on top)
+  const allFeatures = (trips || [])
+    .filter(t => t.waypoints && t.waypoints.length >= 2)
+    .map(t => ({
+      type: 'Feature',
+      properties: { id: t.id },
+      geometry: { type: 'LineString', coordinates: t.waypoints.map(([la, lo]) => [lo, la]) },
+    }));
+
+  map.addSource('trips-all', { type: 'geojson', data: { type: 'FeatureCollection', features: allFeatures } });
+  map.addLayer({
+    id: 'rb-trips-all',
+    type: 'line',
+    source: 'trips-all',
+    paint: { 'line-color': ACCENT, 'line-width': 1.5, 'line-opacity': showAll ? 0.45 : 0 },
+    layout: { 'line-cap': 'round', 'line-join': 'round' },
+  });
+
+  // Active-route layers (hover / open) — drawn on top
   map.addSource('trips-active', { type: 'geojson', data: EMPTY_FC });
-
   map.addLayer({
     id: 'rb-trip-route-glow',
     type: 'line',
@@ -21,7 +40,6 @@ function addRouteLayers(map) {
     paint: { 'line-color': ACCENT, 'line-width': 8, 'line-opacity': 0, 'line-blur': 3 },
     layout: { 'line-cap': 'round', 'line-join': 'round' },
   });
-
   map.addLayer({
     id: 'rb-trip-route',
     type: 'line',
@@ -143,14 +161,25 @@ function PinButton({ trip, pos, hovered, active, theme, onEnter, onLeave, onClic
 
 // ---------- main component ----------
 
-function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, onPinEnter, onPinLeave, onPinClick, onReady }) {
+function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, showAllRoutes, onPinEnter, onPinLeave, onPinClick, onReady }) {
   const containerRef = useRef(null);
   const mapRef       = useRef(null);
   const mountedRef   = useRef(false);
   const animToken    = useRef({ cancelled: true });
   const [pinPositions, setPinPositions] = useState({});
-  // layersReady triggers the route effect after style.load fires
-  const [layersReady, setLayersReady]   = useState(false);
+
+  // Mirror latest props into refs so the async style.load handler always sees
+  // the current values without relying on React state updates (which can be batched).
+  const hoverIdRef      = useRef(hoverId);
+  const openIdRef       = useRef(openId);
+  const showRouteRef    = useRef(showRouteOnHover);
+  const showAllRef      = useRef(showAllRoutes);
+  const tripsRef        = useRef(trips);
+  hoverIdRef.current    = hoverId;
+  openIdRef.current     = openId;
+  showRouteRef.current  = showRouteOnHover;
+  showAllRef.current    = showAllRoutes;
+  tripsRef.current      = trips;
 
   // Init map once
   useEffect(() => {
@@ -173,7 +202,7 @@ function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, onPinEnter, 
 
     const updatePins = () => {
       const pos = {};
-      trips.forEach(t => {
+      tripsRef.current.forEach(t => {
         const pt = map.project([t.pin[1], t.pin[0]]);
         pos[t.id] = { x: pt.x, y: pt.y };
       });
@@ -183,11 +212,18 @@ function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, onPinEnter, 
     map.on('move', updatePins);
     map.on('resize', updatePins);
 
-    // Fires on initial load AND after every setStyle call
+    // Fires on initial load AND after every setStyle call.
+    // Reads refs directly — no React state updates needed to restore the route.
     map.on('style.load', () => {
-      addRouteLayers(map);
+      addRouteLayers(map, tripsRef.current, showAllRef.current);
       updatePins();
-      setLayersReady(true);
+      const activeId   = openIdRef.current || (showRouteRef.current ? hoverIdRef.current : null);
+      const activeTrip = activeId ? tripsRef.current.find(t => t.id === activeId) : null;
+      animToken.current.cancelled = true;
+      if (activeTrip) {
+        animToken.current = { cancelled: false };
+        startRouteAnim(map, activeTrip, animToken.current);
+      }
       if (onReady) onReady(map);
     });
 
@@ -198,26 +234,24 @@ function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, onPinEnter, 
 
   // Theme change → rebuild style
   useEffect(() => {
-    // Skip the first run (mount); the map already uses the correct initial theme
     if (!mountedRef.current) { mountedRef.current = true; return; }
     const map = mapRef.current;
     if (!map) return;
-
     animToken.current.cancelled = true;
-    setLayersReady(false);
-    map.setStyle(buildStyle(theme, MAPTILER_KEY));
-    // style.load fires → the permanent on('style.load') above re-adds layers and sets layersReady
+    // diff:false forces a full style swap so style.load always fires and layers are rebuilt
+    map.setStyle(buildStyle(theme, MAPTILER_KEY), { diff: false });
+    // style.load fires → re-adds layers and restores active route via refs
   }, [theme]); // eslint-disable-line
 
-  // Route visibility — runs whenever hover/open/toggle/layersReady changes
+  // Route effect — handles hover/click/toggle while style is already loaded.
+  // Guard: map.getSource returns null while setStyle is in flight → skips safely.
   useEffect(() => {
     const map = mapRef.current;
-    if (!map || !layersReady) return;
+    if (!map || !map.getSource('trips-active')) return;
 
     const activeId   = openId || (showRouteOnHover ? hoverId : null);
-    const activeTrip = trips.find(t => t.id === activeId) || null;
+    const activeTrip = activeId ? trips.find(t => t.id === activeId) : null;
 
-    // Cancel any running animation
     animToken.current.cancelled = true;
 
     if (!activeTrip) {
@@ -225,10 +259,16 @@ function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, onPinEnter, 
       return;
     }
 
-    // New cancel token for this animation run
     animToken.current = { cancelled: false };
     startRouteAnim(map, activeTrip, animToken.current);
-  }, [hoverId, openId, showRouteOnHover, layersReady]); // eslint-disable-line
+  }, [hoverId, openId, showRouteOnHover]); // eslint-disable-line
+
+  // Show/hide all routes
+  useEffect(() => {
+    const map = mapRef.current;
+    if (!map || !map.getSource('trips-all')) return;
+    map.setPaintProperty('rb-trips-all', 'line-opacity', showAllRoutes ? 0.45 : 0);
+  }, [showAllRoutes]); // eslint-disable-line
 
   return (
     <div style={{ position: 'absolute', inset: 0 }}>

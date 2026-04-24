@@ -226,7 +226,7 @@ function TripDetail({ trip, onClose, theme }) {
             <div className="detail-gallery">
               {trip.gallery.map((g, i) => (
                 trip.images?.gallery?.[i]
-                  ? <img key={i} src={trip.images.gallery[i]} alt={g} className="photo-real gal" />
+                  ? <img key={i} src={trip.images.gallery[i]} alt={g} className="photo-real gal" loading="lazy" />
                   : <div key={i} className="photo-placeholder gal" data-label={g} />
               ))}
             </div>
@@ -240,54 +240,50 @@ function TripDetail({ trip, onClose, theme }) {
               <div className="stat-cell"><b>{trip.difficulty}</b><i>difficulty</i></div>
             </div>
 
-            <div className="detail-section-label">Machine</div>
-            <div className="bike-card">
-              {(() => {
-                const bike = (typeof BIKES !== 'undefined' ? BIKES : []).find(b => b.id === trip.bike_id);
-                const specs = bike ? [bike.year, bike.cc && `${bike.cc} cc`, bike.power_hp && `${bike.power_hp} hp`].filter(Boolean).join(' · ') : '';
-                return (
-                  <>
-                    {bike?.image
-                      ? <img src={bike.image} alt={`${bike.make} ${bike.model}`} className="bike-photo" />
-                      : <div className="bike-silhouette">
-                          <svg viewBox="0 0 120 60" width="100%">
-                            <g stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round">
-                              <circle cx="25" cy="45" r="11" />
-                              <circle cx="95" cy="45" r="11" />
-                              <path d="M25 45 L45 28 L70 28 L85 22 L95 45" />
-                              <path d="M70 28 L75 18 L82 18" />
-                              <path d="M45 28 L50 18 L58 18" />
-                              <rect x="55" y="22" width="22" height="8" rx="2" />
-                            </g>
-                          </svg>
+            {(trip.riders || []).length > 0 && (() => {
+              const allBikes  = typeof BIKES  !== 'undefined' ? BIKES  : [];
+              const allPilots = typeof PILOTS !== 'undefined' ? PILOTS : [];
+              const riders = trip.riders;
+              return (
+                <>
+                  <div className="detail-section-label">{riders.length > 1 ? 'Crew' : 'Rider'}</div>
+                  {riders.map((r, i) => {
+                    const pilot = allPilots.find(p => p.id === r.pilot_id);
+                    const bike  = allBikes.find(b => b.id === r.bike_id);
+                    const specs = bike ? [bike.year, bike.cc && `${bike.cc} cc`, bike.power_hp && `${bike.power_hp} hp`].filter(Boolean).join(' · ') : '';
+                    return (
+                      <div key={i} className="bike-card">
+                        {bike?.image
+                          ? <img src={bike.image} alt={`${bike.make} ${bike.model}`} className="bike-photo" loading="lazy" />
+                          : <div className="bike-silhouette">
+                              <svg viewBox="0 0 120 60" width="100%">
+                                <g stroke="currentColor" strokeWidth="1.2" fill="none" strokeLinecap="round">
+                                  <circle cx="25" cy="45" r="11" />
+                                  <circle cx="95" cy="45" r="11" />
+                                  <path d="M25 45 L45 28 L70 28 L85 22 L95 45" />
+                                  <path d="M70 28 L75 18 L82 18" />
+                                  <path d="M45 28 L50 18 L58 18" />
+                                  <rect x="55" y="22" width="22" height="8" rx="2" />
+                                </g>
+                              </svg>
+                            </div>
+                        }
+                        <div>
+                          {pilot && <div className="rider-name">{pilot.name}</div>}
+                          <div className="bike-name">{bike ? `${bike.make} ${bike.model}` : '—'}</div>
+                          {specs && <div className="bike-specs">{specs}</div>}
                         </div>
-                    }
-                    <div>
-                      <div className="bike-name">{bike ? `${bike.make} ${bike.model}` : '—'}</div>
-                      {specs && <div className="bike-specs">{specs}</div>}
-                    </div>
-                  </>
-                );
-              })()}
-            </div>
+                      </div>
+                    );
+                  })}
+                </>
+              );
+            })()}
 
             <div className="detail-section-label">Gear list</div>
             <ul className="gear-list">
               {trip.gear.map((g, i) => <li key={i}><span>·</span>{g}</li>)}
             </ul>
-
-            {(trip.pilot_ids || []).length > 0 && (() => {
-              const allPilots = typeof PILOTS !== 'undefined' ? PILOTS : [];
-              const found = trip.pilot_ids.map(id => allPilots.find(p => p.id === id)).filter(Boolean);
-              return found.length ? (
-                <>
-                  <div className="detail-section-label">{found.length > 1 ? 'Riders' : 'Rider'}</div>
-                  <ul className="gear-list">
-                    {found.map(p => <li key={p.id}><span>·</span>{p.name}{p.nationality ? `, ${p.nationality}` : ''}</li>)}
-                  </ul>
-                </>
-              ) : null;
-            })()}
 
             <button className="gpx-btn">
               <svg width="14" height="14" viewBox="0 0 14 14">
