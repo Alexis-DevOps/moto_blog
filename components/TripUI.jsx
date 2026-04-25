@@ -303,7 +303,25 @@ function TripDetail({ trip, onClose, theme }) {
               {trip.gear.map((g, i) => <li key={i}><span>·</span>{g}</li>)}
             </ul>
 
-            <button className="gpx-btn">
+            <button className="gpx-btn" onClick={() => {
+              const pts = trip.waypoints.map(([la, lo]) =>
+                `      <trkpt lat="${la}" lon="${lo}"></trkpt>`
+              ).join('\n');
+              const gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Roadbook — Alexis" xmlns="http://www.topografix.com/GPX/1/1">
+  <trk>
+    <name>${trip.title}</name>
+    <trkseg>
+${pts}
+    </trkseg>
+  </trk>
+</gpx>`;
+              const a = document.createElement('a');
+              a.href = URL.createObjectURL(new Blob([gpx], { type: 'application/gpx+xml' }));
+              a.download = `roadbook-${trip.n}.gpx`;
+              a.click();
+              URL.revokeObjectURL(a.href);
+            }}>
               <svg width="14" height="14" viewBox="0 0 14 14">
                 <path d="M7 1 V10 M3 6 L7 10 L11 6 M2 13 H12" stroke="currentColor" strokeWidth="1.3" fill="none" strokeLinecap="round" />
               </svg>
@@ -381,25 +399,6 @@ function TripMiniMap({ trip, theme }) {
         layout: { 'line-cap': 'round', 'line-join': 'round' },
       });
 
-      // Waypoint dots
-      map.addSource('mm-dots', {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: trip.waypoints.map(([la, lo]) => ({
-            type: 'Feature',
-            properties: {},
-            geometry: { type: 'Point', coordinates: [lo, la] },
-          })),
-        },
-      });
-      map.addLayer({
-        id: 'mm-dots',
-        type: 'circle',
-        source: 'mm-dots',
-        paint: { 'circle-radius': 3, 'circle-color': accent },
-      });
-
       // Start / end markers as HTML overlays
       const startCoord = trip.waypoints[0];
       const endCoord   = trip.waypoints[trip.waypoints.length - 1];
@@ -463,19 +462,6 @@ function TripMiniMap({ trip, theme }) {
       map.addLayer({ id: 'mm-route-line', type: 'line', source: 'mm-route',
         paint: { 'line-color': accent, 'line-width': 2.2, 'line-opacity': 0.95 },
         layout: { 'line-cap': 'round', 'line-join': 'round' } });
-
-      map.addSource('mm-dots', {
-        type: 'geojson',
-        data: {
-          type: 'FeatureCollection',
-          features: trip.waypoints.map(([la, lo]) => ({
-            type: 'Feature', properties: {},
-            geometry: { type: 'Point', coordinates: [lo, la] },
-          })),
-        },
-      });
-      map.addLayer({ id: 'mm-dots', type: 'circle', source: 'mm-dots',
-        paint: { 'circle-radius': 3, 'circle-color': accent } });
 
       const startCoord = trip.waypoints[0];
       const endCoord   = trip.waypoints[trip.waypoints.length - 1];

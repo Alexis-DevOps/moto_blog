@@ -194,6 +194,7 @@ function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, showAllRoute
       doubleClickZoom: true,
       dragRotate: false,
       touchZoomRotate: true,
+      touchPitch: false,
       pitchWithRotate: false,
       attributionControl: false,
     });
@@ -272,8 +273,8 @@ function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, showAllRoute
   }, [showAllRoutes]); // eslint-disable-line
 
   return (
-    <div style={{ position: 'absolute', inset: 0 }}>
-      <div ref={containerRef} style={{ position: 'absolute', inset: 0 }} />
+    <div style={{ position: 'absolute', inset: 0, touchAction: 'none' }}>
+      <div ref={containerRef} style={{ position: 'absolute', inset: 0, touchAction: 'none' }} />
       {trips.map(t => (
         <PinButton
           key={t.id}
