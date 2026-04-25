@@ -75,6 +75,10 @@ function buildStyle(theme, maptilerKey) {
         tileSize: 256,
         encoding: 'mapbox',
       },
+      contours: {
+        type: 'vector',
+        url: `https://api.maptiler.com/tiles/contours/tiles.json?key=${key}`,
+      },
     },
     layers: [
       // ── background / land ─────────────────────────────────────────
@@ -155,7 +159,7 @@ function buildStyle(theme, maptilerKey) {
       {
         id: 'rb-contour',
         type: 'line',
-        source: 'maptiler',
+        source: 'contours',
         'source-layer': 'contour',
         minzoom: 5,
         filter: ['!=', ['get', 'nth_line'], 5],
@@ -168,7 +172,7 @@ function buildStyle(theme, maptilerKey) {
       {
         id: 'rb-contour-hi',
         type: 'line',
-        source: 'maptiler',
+        source: 'contours',
         'source-layer': 'contour',
         minzoom: 5,
         filter: ['==', ['get', 'nth_line'], 5],
