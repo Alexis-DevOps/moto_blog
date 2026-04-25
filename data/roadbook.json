@@ -65,7 +65,7 @@
       "nationality": "French",
       "since": 2026,
       "license": "A2",
-      "bio": "",
+      "bio": "\"J'ai du mettre du 95 dans ma moto une fois, je ne referais plus jamais ça.\"",
       "image": ""
     },
     {
@@ -101,7 +101,7 @@
         }
       ],
       "gear": [],
-      "story": "On a allié l'utile à l'agréable, on, est aller chercher les clefs pour la coloc de Léa",
+      "story": "On a allié l'utile à l'agréable, on est aller chercher les clefs pour la coloc de Léa à Clermont-Ferrand. Vercors -> Drome -> Ardeche -> Chaine des puy -> Clermont. Retour plus rapide par Vienne",
       "gallery": [],
       "waypoints": [
         [
@@ -528,7 +528,7 @@
     {
       "id": "t01",
       "n": "01",
-      "title": "Savoie, Haute -Savoie, Ain",
+      "title": "Savoie, Haute-Savoie, Ain",
       "region": "France",
       "date": "4 Aug - 7 Aug 2025",
       "year": 2025,
