@@ -157,9 +157,45 @@ function Timeline({ trips, activeId, hoveredId, onHover, onLeave, onClick }) {
   );
 }
 
+// ---------- Lightbox ----------
+function Lightbox({ imgs, startIdx, onClose }) {
+  const [idx, setIdx] = useState(startIdx);
+  const prev = () => setIdx(i => (i - 1 + imgs.length) % imgs.length);
+  const next = () => setIdx(i => (i + 1) % imgs.length);
+
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === 'Escape')     onClose();
+      if (e.key === 'ArrowLeft')  prev();
+      if (e.key === 'ArrowRight') next();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [imgs.length]); // eslint-disable-line
+
+  return (
+    <div className="lb-scrim" onClick={onClose}>
+      <button className="lb-nav lb-prev" onClick={e => { e.stopPropagation(); prev(); }} aria-label="Previous">&#8592;</button>
+      <img
+        className="lb-img"
+        src={imgs[idx]}
+        alt=""
+        onClick={e => e.stopPropagation()}
+      />
+      <button className="lb-nav lb-next" onClick={e => { e.stopPropagation(); next(); }} aria-label="Next">&#8594;</button>
+      <button className="lb-close" onClick={onClose} aria-label="Close">&#10005;</button>
+      {imgs.length > 1 && (
+        <div className="lb-counter">{idx + 1} / {imgs.length}</div>
+      )}
+    </div>
+  );
+}
+
 // ---------- Trip detail overlay ----------
 function TripDetail({ trip, onClose, theme }) {
   if (!trip) return null;
+
+  const [lbIdx, setLbIdx] = useState(null);
 
   const profilePts = useMemoP(() => {
     const n = 60;
@@ -242,12 +278,26 @@ function TripDetail({ trip, onClose, theme }) {
 
             <div className="detail-section-label">Gallery</div>
             <div className="detail-gallery">
-              {trip.gallery.map((g, i) => (
-                trip.images?.gallery?.[i]
-                  ? <img key={i} src={trip.images.gallery[i]} alt={g} className="photo-real gal" loading="lazy" />
-                  : <div key={i} className="photo-placeholder gal" data-label={g} />
-              ))}
+              {(() => {
+                const imgs = trip.images?.gallery || [];
+                const caps = trip.gallery || [];
+                const count = Math.max(imgs.length, caps.length);
+                return Array.from({ length: count }, (_, i) =>
+                  imgs[i]
+                    ? <button key={i} className="gal-thumb" onClick={() => setLbIdx(i)}>
+                        <img src={imgs[i]} alt={caps[i] || ''} className="photo-real gal" loading="lazy" />
+                      </button>
+                    : <div key={i} className="photo-placeholder gal" data-label={caps[i] || ''} />
+                );
+              })()}
             </div>
+            {lbIdx !== null && (
+              <Lightbox
+                imgs={(trip.images?.gallery || []).filter(Boolean)}
+                startIdx={lbIdx}
+                onClose={() => setLbIdx(null)}
+              />
+            )}
           </div>
 
           <div className="detail-col detail-col-side">
@@ -368,6 +418,14 @@ function TripMiniMap({ trip, theme }) {
     map.on('style.load', () => {
       map.fitBounds(bounds, { padding: 40, duration: 0 });
 
+      // Relax label collision so more place names fit in the small fixed viewport
+      ['rb-label-country', 'rb-label-city', 'rb-label-village'].forEach(id => {
+        if (!map.getLayer(id)) return;
+        map.setLayoutProperty(id, 'text-padding', 1);
+        map.setLayoutProperty(id, 'text-allow-overlap', false);
+        map.setLayoutProperty(id, 'symbol-spacing', 100);
+      });
+
       const accent = ACCENT;
       const dark = themeRef.current === 'dark';
 
@@ -441,6 +499,13 @@ function TripMiniMap({ trip, theme }) {
     map.setStyle(buildStyle(theme, MAPTILER_KEY));
     map.once('style.load', () => {
       map.fitBounds(bounds, { padding: 40, duration: 0 });
+
+      ['rb-label-country', 'rb-label-city', 'rb-label-village'].forEach(id => {
+        if (!map.getLayer(id)) return;
+        map.setLayoutProperty(id, 'text-padding', 1);
+        map.setLayoutProperty(id, 'text-allow-overlap', false);
+        map.setLayoutProperty(id, 'symbol-spacing', 100);
+      });
 
       const accent = ACCENT;
       const dark = theme === 'dark';

@@ -316,17 +316,41 @@ function buildStyle(theme, maptilerKey) {
         'source-layer': 'place',
         filter: ['in', ['get', 'class'], ['literal', ['city', 'town']]],
         minzoom: 4,
-        maxzoom: 10,
+        maxzoom: 14,
+        layout: {
+          'text-field': ['get', 'name:en'],
+          'text-font': ['Noto Sans Bold'],
+          'text-size': ['interpolate', ['linear'], ['zoom'], 4, 11, 8, 15, 12, 17],
+          'text-letter-spacing': 0.04,
+        },
+        paint: {
+          'text-color': C.text,
+          'text-halo-color': C.land,
+          'text-halo-width': 2,
+          'text-opacity': 1,
+        },
+      },
+
+      // ── village / hamlet labels (zoom 7+) ─────────────────────────
+      {
+        id: 'rb-label-village',
+        type: 'symbol',
+        source: 'maptiler',
+        'source-layer': 'place',
+        filter: ['in', ['get', 'class'], ['literal', ['village', 'hamlet', 'suburb']]],
+        minzoom: 7,
+        maxzoom: 14,
         layout: {
           'text-field': ['get', 'name:en'],
           'text-font': ['Noto Sans Regular'],
-          'text-size': ['interpolate', ['linear'], ['zoom'], 4, 9, 8, 13],
+          'text-size': ['interpolate', ['linear'], ['zoom'], 7, 10, 10, 13, 13, 14],
+          'text-letter-spacing': 0.02,
         },
         paint: {
           'text-color': C.textDim,
           'text-halo-color': C.land,
-          'text-halo-width': 1.2,
-          'text-opacity': 0.75,
+          'text-halo-width': 1.5,
+          'text-opacity': 0.9,
         },
       },
 

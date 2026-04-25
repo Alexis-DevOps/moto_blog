@@ -101,7 +101,7 @@
         }
       ],
       "gear": [],
-      "story": "On a allié l'utile à l'agréable, on est aller chercher les clefs pour la coloc de Léa à Clermont-Ferrand. Vercors -> Drome -> Ardeche -> Chaine des puy -> Clermont. Retour plus rapide par Vienne",
+      "story": "On a allié l'utile à l'agréable, on est allé chercher les clefs de l'appart de Léa à Clermont-Ferrand. On est passé par : Vercors -> Drome -> Ardeche -> Chaine des puy -> Clermont. Retour plus rapide par Vienne",
       "gallery": [],
       "waypoints": [
         [
@@ -522,7 +522,11 @@
         4.22
       ],
       "images": {
-        "hero": "images/t1/hero.jpg"
+        "hero": "images/t1/hero.jpg",
+        "gallery": [
+          "images/t2/1.jpg",
+          "images/t2/2.jpg"
+        ]
       }
     },
     {
@@ -808,13 +812,18 @@
         6.09
       ],
       "images": {
-        "hero": "images/t2/hero.jpg"
+        "hero": "images/t2/hero.jpg",
+        "gallery": [
+          "images/t1/1.jpg",
+          "images/t1/2.jpg",
+          "images/t1/3.jpg"
+        ]
       }
     },
     {
       "id": "t03",
       "n": "03",
-      "title": "Week-end de Paque",
+      "title": "Week-end de Pâque",
       "region": "France",
       "date": "4 Apr - 5 Apr 2026",
       "year": 2026,
@@ -1106,7 +1115,13 @@
         5.94
       ],
       "images": {
-        "hero": "images/t3/hero.jpg"
+        "hero": "images/t3/hero.jpg",
+        "gallery": [
+          "images/t3/1.jpg",
+          "images/t3/2.jpg",
+          "images/t3/3.jpg",
+          "images/t3/4.jpg"
+        ]
       }
     }
   ],
