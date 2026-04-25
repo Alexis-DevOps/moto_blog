@@ -193,11 +193,12 @@ function TopoMap({ theme, trips, hoverId, openId, showRouteOnHover, showAllRoute
       scrollZoom: true,
       doubleClickZoom: true,
       dragRotate: false,
-      touchZoomRotate: false,
+      touchZoomRotate: true,
       pitchWithRotate: false,
       attributionControl: false,
     });
 
+    map.touchZoomRotate.disableRotation();
     map.addControl(new maplibregl.AttributionControl({ compact: true }), 'bottom-right');
 
     const updatePins = () => {
