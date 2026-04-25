@@ -1,7 +1,7 @@
 {
   "bikes": [
     {
-      "id": "bike03",
+      "id": "bike01",
       "make": "Honda",
       "model": "CB 500 X",
       "year": 2017,
@@ -10,11 +10,11 @@
       "power_hp": 47,
       "weight_kg": 196,
       "color": "White",
-      "notes": "My First Bike, Alexis",
+      "notes": "",
       "image": "images/bikes/cb500x.jpeg"
     },
     {
-      "id": "bike04",
+      "id": "bike02",
       "make": "Honda",
       "model": "CBF 125",
       "year": 2013,
@@ -25,6 +25,19 @@
       "color": "Black",
       "notes": "",
       "image": "images/bikes/cbf125.png"
+    },
+    {
+      "id": "bike03",
+      "make": "Honda",
+      "model": "CB 500 X",
+      "year": 2023,
+      "type": "Adventure",
+      "cc": 471,
+      "power_hp": 47,
+      "weight_kg": 199,
+      "color": "Black",
+      "notes": "",
+      "image": "images/bikes/cb500x2.jpg"
     }
   ],
   "pilots": [
@@ -45,12 +58,30 @@
       "license": "A1",
       "bio": "",
       "image": "images/pilots/lea.png"
+    },
+    {
+      "id": "pilot03",
+      "name": "Okzie",
+      "nationality": "French",
+      "since": 2026,
+      "license": "A2",
+      "bio": "",
+      "image": ""
+    },
+    {
+      "id": "pilot04",
+      "name": "Antoine",
+      "nationality": "French",
+      "since": 2026,
+      "license": "A2",
+      "bio": "",
+      "image": ""
     }
   ],
   "trips": [
     {
-      "id": "t01",
-      "n": "01",
+      "id": "t02",
+      "n": "02",
       "title": "Grenoble - Clermont",
       "region": "France",
       "date": "11 Aug  - 14 Aug 2025",
@@ -62,15 +93,15 @@
       "riders": [
         {
           "pilot_id": "pilot01",
-          "bike_id": "bike03"
+          "bike_id": "bike01"
         },
         {
           "pilot_id": "pilot02",
-          "bike_id": "bike04"
+          "bike_id": "bike02"
         }
       ],
       "gear": [],
-      "story": "On a allié pratique et plaisir, on, est aller chercher les clefs pour la coloc de Léa",
+      "story": "On a allié l'utile à l'agréable, on, est aller chercher les clefs pour la coloc de Léa",
       "gallery": [],
       "waypoints": [
         [
@@ -495,8 +526,8 @@
       }
     },
     {
-      "id": "t02",
-      "n": "02",
+      "id": "t01",
+      "n": "01",
       "title": "Savoie, Haute -Savoie, Ain",
       "region": "France",
       "date": "4 Aug - 7 Aug 2025",
@@ -508,11 +539,11 @@
       "riders": [
         {
           "pilot_id": "pilot01",
-          "bike_id": "bike03"
+          "bike_id": "bike01"
         },
         {
           "pilot_id": "pilot02",
-          "bike_id": "bike04"
+          "bike_id": "bike02"
         }
       ],
       "gear": [],
@@ -779,16 +810,315 @@
       "images": {
         "hero": "images/t2/hero.jpg"
       }
+    },
+    {
+      "id": "t03",
+      "n": "03",
+      "title": "Trip de Paque",
+      "region": "France",
+      "date": "4 Apr - 5 Apr 2026",
+      "year": 2026,
+      "km": 471,
+      "days": 1,
+      "elev": 0,
+      "difficulty": "Easy",
+      "riders": [
+        {
+          "pilot_id": "pilot01",
+          "bike_id": "bike01"
+        },
+        {
+          "pilot_id": "pilot03",
+          "bike_id": "bike03"
+        },
+        {
+          "pilot_id": "pilot04",
+          "bike_id": "bike02"
+        }
+      ],
+      "gear": [],
+      "story": "",
+      "gallery": [],
+      "waypoints": [
+        [
+          45.19,
+          5.72
+        ],
+        [
+          45.22,
+          5.67
+        ],
+        [
+          45.29,
+          5.62
+        ],
+        [
+          45.43,
+          5.75
+        ],
+        [
+          45.52,
+          5.76
+        ],
+        [
+          45.54,
+          5.82
+        ],
+        [
+          45.54,
+          5.76
+        ],
+        [
+          45.49,
+          5.77
+        ],
+        [
+          45.46,
+          5.74
+        ],
+        [
+          45.44,
+          5.75
+        ],
+        [
+          45.42,
+          5.85
+        ],
+        [
+          45.48,
+          5.92
+        ],
+        [
+          45.46,
+          5.99
+        ],
+        [
+          45.56,
+          6.17
+        ],
+        [
+          45.59,
+          6.15
+        ],
+        [
+          45.58,
+          6.14
+        ],
+        [
+          45.65,
+          6.17
+        ],
+        [
+          45.72,
+          6.1
+        ],
+        [
+          45.76,
+          6.12
+        ],
+        [
+          45.78,
+          6.15
+        ],
+        [
+          45.82,
+          6.15
+        ],
+        [
+          45.82,
+          6.21
+        ],
+        [
+          45.8,
+          6.21
+        ],
+        [
+          45.83,
+          6.21
+        ],
+        [
+          45.85,
+          6.15
+        ],
+        [
+          45.9,
+          6.13
+        ],
+        [
+          45.91,
+          6.16
+        ],
+        [
+          45.87,
+          6.2
+        ],
+        [
+          45.89,
+          6.24
+        ],
+        [
+          45.87,
+          6.21
+        ],
+        [
+          45.84,
+          6.21
+        ],
+        [
+          45.78,
+          6.23
+        ],
+        [
+          45.8,
+          6.2
+        ],
+        [
+          45.83,
+          6.21
+        ],
+        [
+          45.79,
+          6.21
+        ],
+        [
+          45.76,
+          6.26
+        ],
+        [
+          45.81,
+          6.26
+        ],
+        [
+          45.81,
+          6.24
+        ],
+        [
+          45.86,
+          6.21
+        ],
+        [
+          45.89,
+          6.23
+        ],
+        [
+          45.89,
+          6.25
+        ],
+        [
+          45.94,
+          6.16
+        ],
+        [
+          45.92,
+          6.09
+        ],
+        [
+          45.94,
+          6.07
+        ],
+        [
+          45.9,
+          6.04
+        ],
+        [
+          45.93,
+          5.97
+        ],
+        [
+          45.96,
+          5.99
+        ],
+        [
+          45.98,
+          5.94
+        ],
+        [
+          45.95,
+          5.82
+        ],
+        [
+          45.87,
+          5.78
+        ],
+        [
+          45.91,
+          5.78
+        ],
+        [
+          45.86,
+          5.79
+        ],
+        [
+          45.86,
+          5.78
+        ],
+        [
+          45.84,
+          5.79
+        ],
+        [
+          45.78,
+          5.77
+        ],
+        [
+          45.75,
+          5.79
+        ],
+        [
+          45.71,
+          5.76
+        ],
+        [
+          45.68,
+          5.85
+        ],
+        [
+          45.59,
+          5.89
+        ],
+        [
+          45.49,
+          6.02
+        ],
+        [
+          45.33,
+          5.96
+        ],
+        [
+          45.25,
+          5.88
+        ],
+        [
+          45.21,
+          5.78
+        ],
+        [
+          45.16,
+          5.75
+        ],
+        [
+          45.12,
+          5.78
+        ]
+      ],
+      "pin": [
+        45.55,
+        5.94
+      ],
+      "images": {
+        "hero": "images/t3/hero.jpg"
+      }
     }
   ],
   "stats": {
-    "total_km": 1303,
-    "total_days": 8,
+    "total_km": 1774,
+    "total_days": 9,
     "total_elev": 0,
-    "trips": 2,
+    "trips": 3,
     "countries": 1,
     "years": [
-      2025
+      2025,
+      2026
     ]
   }
 }

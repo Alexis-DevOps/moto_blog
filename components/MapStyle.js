@@ -14,8 +14,8 @@
 const MAPTILER_KEY = (typeof window !== 'undefined' && window.MAPTILER_KEY) || '';
 
 const DARK = {
-  sea:          '#06090d',
-  seaDeep:      '#0a0f14',
+  sea:          '#215367',
+  seaDeep:      '#183c4bff',
   land:         '#14202b',
   land2:        '#1a2936',
   coastline:    '#3d5a76',
@@ -27,7 +27,7 @@ const DARK = {
   accent:       '#e86a33',
   hillShadow:   '#020406',
   hillHigh:     '#2e4f70',
-  water:        '#080c12',
+  water:        '#14323fff',
   roadMotorway: '#3e6a8a',
   roadPrimary:  '#3a6080',
   roadSecondary:'#2a4558',
@@ -38,8 +38,8 @@ const DARK = {
 const LIGHT = {
   sea:          '#e8eef2',
   seaDeep:      '#dde6ec',
-  land:         '#f4ede0',
-  land2:        '#ece3d0',
+  land:         '#f1e3c7ff',
+  land2:        '#ebdbbaff',
   coastline:    '#6b5a3e',
   contour:      '#b8a27a',
   contourHi:    '#8c6e40',
@@ -49,7 +49,7 @@ const LIGHT = {
   accent:       '#e86a33',
   hillShadow:   '#a08860',
   hillHigh:     '#fdf8f0',
-  water:        '#c8d8e4',
+  water:        '#35D5FE',
   roadMotorway: '#6090b8',
   roadPrimary:  '#5880a8',
   roadSecondary:'#7898b8',
@@ -77,11 +77,11 @@ function buildStyle(theme, maptilerKey) {
       },
     },
     layers: [
-      // ── background / sea ──────────────────────────────────────────
+      // ── background / land ─────────────────────────────────────────
       {
         id: 'rb-background',
         type: 'background',
-        paint: { 'background-color': C.sea },
+        paint: { 'background-color': C.land },
       },
 
       // ── hillshading ───────────────────────────────────────────────
@@ -298,7 +298,7 @@ function buildStyle(theme, maptilerKey) {
         },
         paint: {
           'text-color': C.text,
-          'text-halo-color': C.sea,
+          'text-halo-color': C.land,
           'text-halo-width': 1.5,
           'text-opacity': 0.85,
         },
@@ -320,7 +320,7 @@ function buildStyle(theme, maptilerKey) {
         },
         paint: {
           'text-color': C.textDim,
-          'text-halo-color': C.sea,
+          'text-halo-color': C.land,
           'text-halo-width': 1.2,
           'text-opacity': 0.75,
         },
